@@ -4,29 +4,28 @@ import { Upload, FileText, AlertCircle } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { BudgetData } from '@/pages/Index';
+import { BudgetDataZepto } from '@/pages/Index';
 
 interface BudgetUploadProps {
-  onDataUpload: (data: BudgetData[]) => void;
+  onDataUpload: (data: BudgetDataZepto[]) => void;
+   id: string;
 }
 
-export const BudgetUpload: React.FC<BudgetUploadProps> = ({ onDataUpload }) => {
+export const BudgetUpload: React.FC<BudgetUploadProps> = ({ onDataUpload, id }) => {
   const [dragActive, setDragActive] = React.useState(false);
   const [error, setError] = React.useState<string>('');
   const [loading, setLoading] = React.useState(false);
 
-  const requiredColumns = [
-    'Product Code',
-    'Product Name', 
-    'Total Sales in Lakhs - Period 1',
-    'Total Sales in Lakhs - Period 2',
-    'Total Spend - Period 1',
-    'Total Spend - Period 2',
-    'ROI - Period 1',
-    'ROI - Period 2'
-  ];
+  //  const requiredColumns = [
+  //   'ProductID',
+  //   'ProductName',
+  //    'Campaign_id',  
+  //   'Revenue',
+  //   'Spend',
+  //   'Roas',
+  // ];
 
-  const parseCSV = useCallback((csvText: string): BudgetData[] => {
+  const parseCSV = useCallback((csvText: string): BudgetDataZepto[] => {
     const lines = csvText.trim().split('\n');
     if (lines.length < 2) {
       throw new Error('CSV file must contain at least a header row and one data row');
@@ -35,12 +34,12 @@ export const BudgetUpload: React.FC<BudgetUploadProps> = ({ onDataUpload }) => {
     const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
     
     // Check for required columns
-    const missingColumns = requiredColumns.filter(col => !headers.includes(col));
-    if (missingColumns.length > 0) {
-      throw new Error(`Missing required columns: ${missingColumns.join(', ')}`);
-    }
+    // const missingColumns = requiredColumns.filter(col => !headers.includes(col));
+    // if (missingColumns.length > 0) {
+    //   throw new Error(`Missing required columns: ${missingColumns.join(', ')}`);
+    // }
 
-    const data: BudgetData[] = [];
+    const data: BudgetDataZepto[] = [];
     
     for (let i = 1; i < lines.length; i++) {
       const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''));
@@ -66,7 +65,7 @@ export const BudgetUpload: React.FC<BudgetUploadProps> = ({ onDataUpload }) => {
         }
       });
 
-      data.push(row as BudgetData);
+      data.push(row as BudgetDataZepto);
     }
 
     if (data.length === 0) {
@@ -74,7 +73,7 @@ export const BudgetUpload: React.FC<BudgetUploadProps> = ({ onDataUpload }) => {
     }
 
     return data;
-  }, [requiredColumns]);
+  }, []);
 
   const handleFileUpload = useCallback(async (file: File) => {
     if (file.type !== 'text/csv' && !file.name.endsWith('.csv')) {
@@ -169,10 +168,10 @@ export const BudgetUpload: React.FC<BudgetUploadProps> = ({ onDataUpload }) => {
                 accept=".csv"
                 onChange={handleFileInputChange}
                 className="hidden"
-                id="file-upload"
+                id={id}
               />
               <Button asChild variant="outline" size="sm" className="border-gray-600 hover:border-gray-500 text-gray-200 hover:text-gray-100">
-                <label htmlFor="file-upload" className="cursor-pointer">
+                <label htmlFor={id} className="cursor-pointer">
                   Choose File
                 </label>
               </Button>

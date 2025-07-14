@@ -1,7 +1,39 @@
 
-import { BudgetData, AnalysisResult } from '@/pages/Index';
+import { BudgetDataZepto, BudgetDataZeptoReturn, AnalysisResult } from '@/pages/Index';
 
-export function processCSVData(data: BudgetData[], totalBudgetLakhs: number): AnalysisResult[] {
+export function mergeBudgetData(
+  data1: BudgetDataZepto[], 
+  data2: BudgetDataZepto[]
+): BudgetDataZeptoReturn[] {
+  const map1 = new Map<string, BudgetDataZepto>();
+
+  data1.forEach(item => {
+    const key = `${item.ProductID}|${item.Campaign_id}`;
+    map1.set(key, item);
+  });
+
+  return data2.map(item2 => {
+    const key = `${item2.ProductID}|${item2.Campaign_id}`;
+    const item1 = map1.get(key);
+
+    return {
+      'ProductID' : item2['ProductID'],
+      'ProductName': item2['ProductName'],
+      'Campaign_id': item2['Campaign_id'],
+      'Total Sales in Lakhs - Period 1': Number(item1['Revenue'] ?? 0),
+      'Total Spend - Period 1': Number(item1['Spend'] ?? 0),
+      'ROI - Period 1': Number(item1['Roas'] ?? 0),
+      'Total Sales in Lakhs - Period 2': Number(item2['Revenue']),
+      'Total Spend - Period 2':  Number(item2['Spend']),
+      'ROI - Period 2': Number(item2['Roas']),
+    };
+  });
+}
+
+export function processCSVData(data: BudgetDataZepto[], totalBudgetLakhs: number): AnalysisResult[] {
+
+  console.log("data in processCSV Data", data);
+  
   console.log(`Processing ${data.length} products with ₹${totalBudgetLakhs} Lakhs budget`);
 
   // Calculate incremental metrics

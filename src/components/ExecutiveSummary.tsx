@@ -103,7 +103,7 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({ results, tot
             <div className="flex items-center gap-2">
               <DollarSign className="h-5 w-5 text-blue-600" />
               <div>
-                <div className="text-2xl font-bold text-blue-600">₹{(metrics.totalAllocated * 100).toFixed(0)}K</div>
+                <div className="text-2xl font-bold text-blue-600">₹{(metrics.totalAllocated).toFixed(0)}K</div>
                 <div className="text-sm text-blue-700">Budget Allocated</div>
                 <div className="text-xs text-blue-600">{metrics.budgetUtilization.toFixed(1)}% utilization</div>
               </div>
@@ -134,7 +134,7 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({ results, tot
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="text-center p-4 bg-green-50 rounded-lg">
-              <div className="text-3xl font-bold text-green-600 mb-2">₹{(metrics.expectedIncrease * 100).toFixed(0)}K</div>
+              <div className="text-3xl font-bold text-green-600 mb-2">₹{(metrics.expectedIncrease).toFixed(0)}</div>
               <div className="text-sm text-green-700 font-medium">Expected Sales Increase</div>
               <div className="text-xs text-green-600 mt-1">From optimized allocation</div>
             </div>
@@ -144,7 +144,7 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({ results, tot
               <div className="text-xs text-blue-600 mt-1">Across funded products</div>
             </div>
             <div className="text-center p-4 bg-purple-50 rounded-lg">
-              <div className="text-3xl font-bold text-purple-600 mb-2">₹{((totalBudget - metrics.totalAllocated) * 100).toFixed(0)}K</div>
+              <div className="text-3xl font-bold text-purple-600 mb-2">₹{((totalBudget - metrics.totalAllocated)).toFixed(0)}</div>
               <div className="text-sm text-purple-700 font-medium">Remaining Budget</div>
               <div className="text-xs text-purple-600 mt-1">Available for adjustment</div>
             </div>

@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Upload, Calculator, BarChart3, Download, AlertCircle, CheckCircle, TrendingUp, DollarSign, Target, Zap } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,20 +11,18 @@ import { BudgetUpload } from '@/components/BudgetUpload';
 import { AnalysisResults } from '@/components/AnalysisResults';
 import { DataPreview } from '@/components/DataPreview';
 import { ExecutiveSummary } from '@/components/ExecutiveSummary';
-import { processCSVData } from '@/utils/budgetAnalysis';
+import { processCSVData, mergeBudgetData } from '@/utils/budgetAnalysis';
 
-export interface BudgetData {
-  'Product Code': string;
+export interface BudgetDataZepto {
+  'ProductID': string;
+  'Campaign_id': string;
   'Product Name': string;
-  'Total Sales in Lakhs - Period 1': number;
-  'Total Sales in Lakhs - Period 2': number;
-  'Total Spend - Period 1': number;
-  'Total Spend - Period 2': number;
-  'ROI - Period 1': number;
-  'ROI - Period 2': number;
+  'Revenue': number;
+  'Spend': number;
+  'Roas': number;
 }
 
-export interface AnalysisResult extends BudgetData {
+export interface AnalysisResult extends BudgetDataZepto {
   Incremental_Sales: number;
   Incremental_Spend: number;
   Original_Incremental_ROI: number;
@@ -41,7 +39,10 @@ export interface AnalysisResult extends BudgetData {
 }
 
 const Index = () => {
-  const [csvData, setCsvData] = useState<BudgetData[]>([]);
+  const [csvData, setCsvData] = useState<BudgetDataZepto[]>([]);
+  const [csvData2, setCsvData2] = useState<BudgetDataZepto[]>([]);
+  const [isFirstFileUploaded, setIsFirstFileUploaded] = useState(false);
+
   const [totalBudget, setTotalBudget] = useState<string>('');
   const [analysisResults, setAnalysisResults] = useState<AnalysisResult[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -49,11 +50,19 @@ const Index = () => {
   const [error, setError] = useState<string>('');
   const [activeTab, setActiveTab] = useState('upload');
 
-  const handleDataUpload = useCallback((data: BudgetData[]) => {
+  const handleDataUpload = useCallback((data: BudgetDataZepto[]) => {
     setCsvData(data);
     setError('');
-    setActiveTab('configure');
+    setIsFirstFileUploaded(true);
   }, []);
+
+  const handleDataUpload2 = useCallback((data: BudgetDataZepto[]) => {
+    setCsvData2(data);
+    setError('');
+    if(isFirstFileUploaded){
+      setActiveTab('configure');
+    }
+  }, [isFirstFileUploaded]);
 
   const runAnalysis = async () => {
     if (!csvData.length || !totalBudget) {
@@ -86,7 +95,13 @@ const Index = () => {
         await new Promise(resolve => setTimeout(resolve, 300));
       }
 
-      const results = processCSVData(csvData, budget);
+      const mergedresult = mergeBudgetData(csvData, csvData2);
+
+      const results = processCSVData(mergedresult,budget);
+
+      console.log("results", results);
+      
+
       setAnalysisResults(results);
       setActiveTab('results');
     } catch (err) {
@@ -126,6 +141,10 @@ const Index = () => {
     expectedIncrease: analysisResults.reduce((sum, p) => sum + p.Projected_Sales_Increase, 0)
   } : null;
 
+
+  console.log("csvdata2", csvData2);
+  
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -153,7 +172,7 @@ const Index = () => {
                   <div className="text-muted-foreground">Efficiency Winners</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-purple-400">₹{(stats.totalAllocated * 100).toFixed(0)}K</div>
+                  <div className="text-2xl font-bold text-purple-400">₹{(stats.totalAllocated).toFixed(0)}</div>
                   <div className="text-muted-foreground">Total Allocated</div>
                 </div>
               </div>
@@ -195,7 +214,8 @@ const Index = () => {
           <TabsContent value="upload" className="mt-6">
             <div className="flex justify-center">
               <div className="w-full max-w-2xl space-y-6">
-                <BudgetUpload onDataUpload={handleDataUpload} />
+                <BudgetUpload id="file-upload-1" onDataUpload={handleDataUpload} />
+                <BudgetUpload id="file-upload-2" onDataUpload={handleDataUpload2} />
                 
                 <Card>
                   <CardHeader>
@@ -289,7 +309,7 @@ const Index = () => {
                             <div>
                               <span className="text-muted-foreground">Current Total Sales:</span>
                               <span className="ml-2 font-medium">
-                                ₹{(csvData.reduce((sum, p) => sum + p['Total Sales in Lakhs - Period 2'], 0) * 100).toFixed(0)}K
+                                ₹{(csvData.reduce((sum, p) => sum + Number(p['Revenue']), 0)).toFixed(0)}
                               </span>
                             </div>
                           </div>

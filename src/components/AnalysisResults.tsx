@@ -24,7 +24,7 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ results, total
   
   // Chart data
   const topProductsChart = results.slice(0, 10).map(p => ({
-    name: p['Product Name'].length > 15 ? p['Product Name'].substring(0, 15) + '...' : p['Product Name'],
+    name: p['ProductName'].length > 15 ? p['ProductName'].substring(0, 15) + '...' : p['ProductName'],
     allocation: p.New_Budget_Allocation * 100,
     multiplier: p.Budget_Multiplier,
     isEfficiency: p.isEfficiencyWinner
@@ -34,12 +34,12 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ results, total
     efficiency: p.Efficiency_Score,
     incremental: p.Incremental_ROI_Score,
     allocation: p.New_Budget_Allocation * 100,
-    name: p['Product Name']
+    name: p['ProductName']
   }));
 
   const budgetDistribution = [
-    { name: 'Allocated', value: totalAllocated * 100, color: '#8884d8' },
-    { name: 'Remaining', value: (totalBudget - totalAllocated) * 100, color: '#82ca9d' }
+    { name: 'Allocated', value: totalAllocated, color: '#8884d8' },
+    { name: 'Remaining', value: (totalBudget - totalAllocated), color: '#82ca9d' }
   ];
 
   return (
@@ -75,7 +75,7 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ results, total
             <div className="flex items-center gap-2">
               <DollarSign className="h-5 w-5 text-green-500" />
               <div>
-                <div className="text-2xl font-bold text-green-600">₹{(totalAllocated * 100).toFixed(0)}K</div>
+                <div className="text-2xl font-bold text-green-600">₹{(totalAllocated).toFixed(0)}</div>
                 <div className="text-sm text-gray-600">Total Allocated</div>
               </div>
             </div>
@@ -87,7 +87,7 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ results, total
             <div className="flex items-center gap-2">
               <TrendingUp className="h-5 w-5 text-purple-500" />
               <div>
-                <div className="text-2xl font-bold text-purple-600">₹{(expectedIncrease * 100).toFixed(0)}K</div>
+                <div className="text-2xl font-bold text-purple-600">₹{(expectedIncrease).toFixed(0)}</div>
                 <div className="text-sm text-gray-600">Expected Increase</div>
               </div>
             </div>
@@ -254,30 +254,30 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ results, total
                     <TableCell className="font-medium">#{index + 1}</TableCell>
                     <TableCell>
                       <div>
-                        <div className="font-medium">{product['Product Name']}</div>
-                        <div className="text-sm text-gray-500">{product['Product Code']}</div>
+                        <div className="font-medium">{product['ProductName']}</div>
+                        <div className="text-sm text-gray-500">{product['ProductID']}</div>
                       </div>
                     </TableCell>
-                    <TableCell className="text-right">₹{(product['Total Sales in Lakhs - Period 2'] * 100).toFixed(0)}K</TableCell>
+                    <TableCell className="text-right">₹{(product['Total Sales in Lakhs - Period 2'])}</TableCell>
                     <TableCell className="text-right">
                       <span className={product.Incremental_Sales > 0 ? 'text-green-600' : 'text-red-600'}>
-                        {product.Incremental_Sales > 0 ? '+' : ''}₹{(product.Incremental_Sales * 100).toFixed(0)}K
+                        {product.Incremental_Sales > 0 ? '+' : ''}₹{(product.Incremental_Sales)}
                       </span>
                     </TableCell>
                     <TableCell className="text-right">
                       <span className={product.Incremental_Spend < 0 ? 'text-green-600' : 'text-red-600'}>
-                        ₹{(product.Incremental_Spend * 100).toFixed(0)}K
+                        ₹{(product.Incremental_Spend)}
                       </span>
                     </TableCell>
                     <TableCell className="text-right">{product.Efficiency_Score.toFixed(3)}</TableCell>
                     <TableCell className="text-right">
-                      {product.New_Budget_Allocation > 0 ? `₹${(product.New_Budget_Allocation * 100).toFixed(0)}K` : '-'}
+                      {product.New_Budget_Allocation > 0 ? `₹${(product.New_Budget_Allocation)}` : '-'}
                     </TableCell>
                     <TableCell className="text-right">
-                      {product.Budget_Multiplier > 1 ? `${product.Budget_Multiplier.toFixed(1)}x` : '-'}
+                      {product.Budget_Multiplier > 1 ? `${product.Budget_Multiplier}x` : '-'}
                     </TableCell>
                     <TableCell className="text-right">
-                      {product.Projected_Sales_Increase > 0 ? `₹${(product.Projected_Sales_Increase * 100).toFixed(0)}K` : '-'}
+                      {product.Projected_Sales_Increase > 0 ? `₹${(product.Projected_Sales_Increase)}` : '-'}
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-1">

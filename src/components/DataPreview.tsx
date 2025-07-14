@@ -41,11 +41,11 @@ export const DataPreview: React.FC<DataPreviewProps> = ({ data }) => {
             <div className="text-sm text-blue-700">Total Products</div>
           </div>
           <div className="bg-green-50 p-3 rounded-lg">
-            <div className="text-2xl font-bold text-green-600">₹{(stats.totalSalesP2 * 100).toFixed(0)}K</div>
+            <div className="text-2xl font-bold text-green-600">₹{(stats.totalSalesP2).toFixed(0)}K</div>
             <div className="text-sm text-green-700">Total Sales P2</div>
           </div>
           <div className="bg-purple-50 p-3 rounded-lg">
-            <div className="text-2xl font-bold text-purple-600">₹{(stats.totalSpendP2 * 100).toFixed(0)}K</div>
+            <div className="text-2xl font-bold text-purple-600">₹{(stats.totalSpendP2).toFixed(0)}K</div>
             <div className="text-sm text-purple-700">Total Spend P2</div>
           </div>
           <div className="bg-orange-50 p-3 rounded-lg">
@@ -76,14 +76,14 @@ export const DataPreview: React.FC<DataPreviewProps> = ({ data }) => {
                   <TableRow key={index}>
                     <TableCell>
                       <div>
-                        <div className="font-medium">{product['Product Name']}</div>
-                        <div className="text-sm text-gray-500">{product['Product Code']}</div>
+                        <div className="font-medium">{product['ProductName']}</div>
+                        <div className="text-sm text-gray-500">{product['ProductID']}</div>
                       </div>
                     </TableCell>
-                    <TableCell className="text-right">₹{(product['Total Sales in Lakhs - Period 1'] * 100).toFixed(0)}K</TableCell>
-                    <TableCell className="text-right">₹{(product['Total Sales in Lakhs - Period 2'] * 100).toFixed(0)}K</TableCell>
-                    <TableCell className="text-right">₹{(product['Total Spend - Period 2'] * 100).toFixed(0)}K</TableCell>
-                    <TableCell className="text-right">{product['ROI - Period 2'].toFixed(2)}x</TableCell>
+                    <TableCell className="text-right">₹{(product['Total Sales in Lakhs - Period 1'])}</TableCell>
+                    <TableCell className="text-right">₹{(product['Total Sales in Lakhs - Period 2'])}</TableCell>
+                    <TableCell className="text-right">₹{(product['Total Spend - Period 2'])}</TableCell>
+                    <TableCell className="text-right">{product['ROI - Period 2']}x</TableCell>
                     <TableCell>
                       <Badge variant={isGrowing ? "default" : "secondary"} className="flex items-center gap-1 w-fit">
                         {isGrowing ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}

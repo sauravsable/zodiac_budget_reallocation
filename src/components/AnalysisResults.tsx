@@ -107,7 +107,7 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ results, total
           <Progress value={utilizationPercentage} className="w-full h-3" />
           <div className="flex justify-between text-sm text-gray-600 mt-2">
             <span>₹0</span>
-            <span>₹{(totalBudget * 100).toFixed(0)}K Total Budget</span>
+            <span>₹{(totalBudget).toFixed(0)} Total Budget</span>
           </div>
         </CardContent>
       </Card>

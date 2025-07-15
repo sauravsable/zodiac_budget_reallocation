@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { TrendingUp, DollarSign, Target, Zap, Trophy, AlertTriangle, CheckCircle } from 'lucide-react';
+import { TrendingUp, Currency, Target, Zap, Trophy, AlertTriangle, CheckCircle } from 'lucide-react';
 import { AnalysisResult } from '@/pages/Index';
 
 interface ExecutiveSummaryProps {
@@ -101,9 +101,9 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({ results, tot
         <Card className="bg-gradient-to-r from-blue-50 to-blue-100">
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
-              <DollarSign className="h-5 w-5 text-blue-600" />
+              <Currency className="h-5 w-5 text-blue-600" />
               <div>
-                <div className="text-2xl font-bold text-blue-600">₹{(metrics.totalAllocated).toFixed(0)}K</div>
+                <div className="text-2xl font-bold text-blue-600">₹{(metrics.totalAllocated).toFixed(0)}</div>
                 <div className="text-sm text-blue-700">Budget Allocated</div>
                 <div className="text-xs text-blue-600">{metrics.budgetUtilization.toFixed(1)}% utilization</div>
               </div>
@@ -178,12 +178,12 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({ results, tot
                     </div>
                     <div className="text-sm text-gray-500">
                       Ranking Score: {product.Ranking_Score.toFixed(3)} | 
-                      Sales Change: {product.Incremental_Sales > 0 ? '+' : ''}₹{(product.Incremental_Sales * 100).toFixed(0)}K
+                      Sales Change: {product.Incremental_Sales > 0 ? '+' : ''}₹{(product.Incremental_Sales).toFixed(0)}
                     </div>
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="font-bold text-green-600">₹{(product.New_Budget_Allocation * 100).toFixed(0)}K</div>
+                  <div className="font-bold text-green-600">₹{(product.New_Budget_Allocation).toFixed(0)}</div>
                   <div className="text-sm text-gray-500">{product.Budget_Multiplier.toFixed(1)}x multiplier</div>
                 </div>
               </div>
@@ -244,7 +244,7 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({ results, tot
             </div>
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
-              <span className="text-sm">Prepare contingency plan for remaining ₹{((totalBudget - metrics.totalAllocated) * 100).toFixed(0)}K budget</span>
+              <span className="text-sm">Prepare contingency plan for remaining ₹{((totalBudget - metrics.totalAllocated)).toFixed(0)} budget</span>
             </div>
           </div>
         </CardContent>

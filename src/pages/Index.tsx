@@ -166,7 +166,7 @@ const Index = () => {
         <div className=" border-b border-border">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <div className="flex items-center justify-between">
-              <div className="w-full py-2">
+              <div className="w-full py-2 ">
                 <h1 className="text-3xl font-bold text-foreground text-center gap-3 w-full">Budget Allocation</h1>
                 <p className="text-muted-foreground mt-1 w-full text-center">
                   Comprehensive Budget Allocation Analysis with Optimized Efficiency Gains
@@ -231,103 +231,102 @@ const Index = () => {
 
             <TabsContent value="upload" className="mt-6">
               <div className="flex justify-center">
-                <div className="w-full space-y-6">
+                <div className="w-full  space-y-6">
                   <div className="w-1/2 mx-auto">
                     <BudgetUpload id="file-upload-1" onDataUpload={handleDataUpload} />
                   </div>
 
                   <div className="text-xs text-gray-400 text-center">
-                    <span className="font-medium">Required columns:</span> Product Code, Product Name, Sales & ROI data
-                    for both periods
+                    <span className="font-medium">Requirement:</span> Upload a sheet dated earlier than the current one.
                   </div>
 
-                  <div className="flex flex-row items-start justify-evenly gap-4 w-full">
-                    <Card className="relative overflow-hidden rounded-xl bg-gradient-to-br from-white to-gray-50 shadow-md border border-gray-200">
-                      <div className="absolute left-0 top-0 h-full w-1 bg-yellow-400 rounded-l-xl" />
 
-                      <CardHeader className="p-6 pb-4">
-                        <CardTitle className="flex items-center gap-3 text-2xl font-bold text-gray-900">
-                          <Zap className="h-6 w-6 text-yellow-400" />
-                          Key Features
-                        </CardTitle>
-                        <CardDescription className="mt-2 text-base text-gray-600">
-                          Supercharge your campaigns with AI-driven performance tools
-                        </CardDescription>
-                      </CardHeader>
+                  <Card className="relative mx-auto w-5/6  overflow-hidden rounded-xl bg-gradient-to-br from-white to-gray-50 shadow-md border border-gray-200">
+                    <div className="absolute left-0 top-0 h-full w-1 bg-yellow-400 rounded-l-xl" />
 
-                      <CardContent className="space-y-5 px-6 pb-6">
-                        {[
-                          {
-                            title: 'Opportunity Finder',
-                            description:
-                              'Identifies hidden growth areas across low-visibility campaigns.',
-                          },
-                          {
-                            title: 'Performance Index',
-                            description:
-                              'Combines spend, ROI, and growth potential into a single score.',
-                          },
-                          {
-                            title: 'Auto Scaling',
-                            description:
-                              'Allocates more budget to top-performers — instantly and intelligently.',
-                          },
-                          {
-                            title: 'Predictive Insights',
-                            description:
-                              'Forecasts success and suggests optimizations with AI modeling.',
-                          },
-                        ].map((feature, index) => (
-                          <div
-                            key={index}
-                            className="flex items-start gap-4 rounded-lg p-4 bg-white hover:bg-gray-50 transition"
-                          >
-                            <CheckCircle className="h-5 w-5 text-green-500 mt-1 flex-shrink-0" />
-                            <div>
-                              <h4 className="text-lg font-semibold text-gray-800">
-                                {feature.title}
-                              </h4>
-                              <p className="text-sm text-gray-600 mt-1">{feature.description}</p>
-                            </div>
-                          </div>
-                        ))}
-                      </CardContent>
-                    </Card>
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>Analysis Methodology</CardTitle>
-                        <CardDescription>How the advanced algorithm works</CardDescription>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div className="space-y-3">
-                          <div className="border-l-4 border-blue-500 pl-3">
-                            <h4 className="font-medium">1. Efficiency Scoring</h4>
-                            <p className="text-sm text-muted-foreground">
-                              Products with increased sales and reduced spend get bonus points
-                            </p>
-                          </div>
-                          <div className="border-l-4 border-green-500 pl-3">
-                            <h4 className="font-medium">2. Weighted Ranking</h4>
-                            <p className="text-sm text-muted-foreground">
-                              30% efficiency + 70% incremental performance
-                            </p>
-                          </div>
-                          <div className="border-l-4 border-purple-500 pl-3">
-                            <h4 className="font-medium">3. Smart Allocation</h4>
-                            <p className="text-sm text-muted-foreground">
-                              Up to 3x budget for efficiency winners, 2.5x for top performers
-                            </p>
-                          </div>
-                          <div className="border-l-4 border-orange-500 pl-3">
-                            <h4 className="font-medium">4. ROI Projection</h4>
-                            <p className="text-sm text-muted-foreground">
-                              Forecasts sales increases based on allocation multipliers
-                            </p>
+                    <CardHeader className="p-6 pb-4">
+                      <CardTitle className="flex items-center gap-3 text-2xl font-bold text-gray-900">
+                        <Zap className="h-6 w-6 text-yellow-400" />
+                        Key Features
+                      </CardTitle>
+                      <CardDescription className="mt-2 text-base text-gray-600">
+                        Supercharge your campaigns with AI-driven performance tools
+                      </CardDescription>
+                    </CardHeader>
+
+                    <CardContent className=" flex flex-row flex-wrap items-start justify-evenly px-6 pb-6">
+                      {[
+                        {
+                          title: 'Opportunity Finder',
+                          description:
+                            'Identifies hidden growth areas across low-visibility campaigns.',
+                        },
+                        {
+                          title: 'Auto Scaling',
+                          description:
+                          'Allocates more budget to top-performers — instantly and intelligently.',
+                        },
+                        {
+                          title: 'Performance Index',
+                          description:
+                            'Combines spend, ROI, and growth potential into a single score.',
+                        },
+                        {
+                          title: 'Predictive Insights',
+                          description:
+                            'Forecasts success and suggests optimizations with AI modeling.',
+                        },
+                      ].map((feature, index) => (
+                        <div
+                          key={index}
+                          className="flex w-1/2 items-start gap-2 rounded-lg p-4 bg-white hover:bg-gray-50 transition"
+                        >
+                          <CheckCircle className="h-5 w-5 text-green-500 mt-1 flex-shrink-0" />
+                          <div>
+                            <h4 className="text-lg font-semibold text-gray-800">
+                              {feature.title}
+                            </h4>
+                            <p className="text-sm text-gray-600 mt-1">{feature.description}</p>
                           </div>
                         </div>
-                      </CardContent>
-                    </Card>
-                  </div>
+                      ))}
+                    </CardContent>
+                  </Card>
+                  <Card className="w-5/6 mx-auto shadow-md border border-gray-200">
+                    <CardHeader>
+                      <CardTitle>Analysis Methodology</CardTitle>
+                      <CardDescription>How the advanced algorithm works</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="space-y-3 flex flex-row item-center justify-between flex-wrap">
+                        <div className="border-l-4 border-blue-500 pl-3 w-1/2">
+                          <h4 className="font-medium">1. Efficiency Scoring</h4>
+                          <p className="text-sm text-muted-foreground">
+                            Products with increased sales and reduced spend get bonus points
+                          </p>
+                        </div>
+                        <div className="border-l-4 border-green-500 pl-3 w-1/2">
+                          <h4 className="font-medium">2. Weighted Ranking</h4>
+                          <p className="text-sm text-muted-foreground">
+                            30% efficiency + 70% incremental performance
+                          </p>
+                        </div>
+                        <div className="border-l-4 border-purple-500 pl-3 w-1/2">
+                          <h4 className="font-medium">3. Smart Allocation</h4>
+                          <p className="text-sm text-muted-foreground">
+                            Up to 3x budget for efficiency winners, 2.5x for top performers
+                          </p>
+                        </div>
+                        <div className="border-l-4 border-orange-500 pl-3 w-1/2">
+                          <h4 className="font-medium">4. ROI Projection</h4>
+                          <p className="text-sm text-muted-foreground">
+                            Forecasts sales increases based on allocation multipliers
+                          </p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
 
                 </div>
               </div>
@@ -349,7 +348,7 @@ const Index = () => {
                       <BudgetUpload id="file-upload-2" onDataUpload={handleDataUpload2} />
                     </div>
 
-                    <div className="bg-white shadow-lg border border-gray-200 rounded-xl p-6 space-y-6">
+                    <div className="bg-white shadow-lg border border-gray-200 rounded-xl p-2 space-y-4">
                       {/* Header */}
                       <div>
                         <div className="flex items-center gap-2 text-2xl font-bold text-gray-800">
@@ -364,7 +363,7 @@ const Index = () => {
                       {/* Budget Input */}
                       <div className="space-y-1">
                         <Label htmlFor="budget" className="text-sm font-medium text-gray-700">
-                          Total Budget (in Lakhs)
+                          Total Budget
                         </Label>
                         <div className="relative mt-1">
                           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">₹</span>
@@ -378,7 +377,7 @@ const Index = () => {
                           />
                         </div>
                         <p className="text-xs text-gray-500 mt-1">
-                          You entered: ₹{totalBudget ? parseFloat(totalBudget).toFixed(2) : "0.00"} Lakhs
+                          You entered: ₹{totalBudget ? parseFloat(totalBudget).toFixed(2) : "0.00"}
                         </p>
                       </div>
 
@@ -562,6 +561,11 @@ const Index = () => {
                   )}
                 </div>
               </div>
+              {csvData.length > 0 && (
+                <div className="m-4">
+                  <DataPreview data={mergeBudgetData(csvData, csvData2)} />
+                </div>
+              )}
               <div className="flex justify-center mt-10">
                 <div className="w-full max-w-6xl">
                   {analysisResults.length > 0 ? (

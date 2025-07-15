@@ -41,11 +41,11 @@ export const DataPreview: React.FC<DataPreviewProps> = ({ data }) => {
             <div className="text-sm text-blue-700">Total Products</div>
           </div>
           <div className="bg-green-50 p-3 rounded-lg">
-            <div className="text-2xl font-bold text-green-600">₹{(stats.totalSalesP2).toFixed(0)}K</div>
+            <div className="text-2xl font-bold text-green-600">₹{(stats.totalSalesP2).toFixed(0)}</div>
             <div className="text-sm text-green-700">Total Sales P2</div>
           </div>
           <div className="bg-purple-50 p-3 rounded-lg">
-            <div className="text-2xl font-bold text-purple-600">₹{(stats.totalSpendP2).toFixed(0)}K</div>
+            <div className="text-2xl font-bold text-purple-600">₹{(stats.totalSpendP2).toFixed(0)}</div>
             <div className="text-sm text-purple-700">Total Spend P2</div>
           </div>
           <div className="bg-orange-50 p-3 rounded-lg">
@@ -87,7 +87,7 @@ export const DataPreview: React.FC<DataPreviewProps> = ({ data }) => {
                     <TableCell>
                       <Badge variant={isGrowing ? "default" : "secondary"} className="flex items-center gap-1 w-fit">
                         {isGrowing ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
-                        {isGrowing ? '+' : ''}{(salesChange * 100).toFixed(0)}K
+                        {isGrowing ? '+' : ''}{(salesChange).toFixed(0)}
                       </Badge>
                     </TableCell>
                   </TableRow>

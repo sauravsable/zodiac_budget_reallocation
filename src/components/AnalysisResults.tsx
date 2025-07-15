@@ -25,7 +25,7 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ results, total
   // Chart data
   const topProductsChart = results.slice(0, 10).map(p => ({
     name: p['ProductName']?.length > 15 ? p['ProductName'].substring(0, 15) + '...' : p['ProductName'],
-    allocation: p.New_Budget_Allocation * 100,
+    allocation: p.New_Budget_Allocation,
     multiplier: p.Budget_Multiplier,
     isEfficiency: p.isEfficiencyWinner
   }));
@@ -33,7 +33,7 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ results, total
   const efficiencyChart = results.map(p => ({
     efficiency: p.Efficiency_Score,
     incremental: p.Incremental_ROI_Score,
-    allocation: p.New_Budget_Allocation * 100,
+    allocation: p.New_Budget_Allocation,
     name: p['ProductName']
   }));
 
@@ -134,7 +134,7 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ results, total
                 <YAxis />
                 <Tooltip 
                   formatter={(value) => [
-                    `₹${typeof value === 'number' ? value.toFixed(0) : value}K`,
+                    `₹${typeof value === 'number' ? value.toFixed(0) : value}`,
                     'Budget Allocation'
                   ]}
                   labelFormatter={(label) => `Product: ${label}`}
@@ -172,7 +172,7 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ results, total
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
-                <Tooltip formatter={(value) => [`₹${typeof value === 'number' ? value.toFixed(0) : value}K`, 'Amount']} />
+                <Tooltip formatter={(value) => [`₹${typeof value === 'number' ? value.toFixed(0) : value}`, 'Amount']} />
               </PieChart>
             </ResponsiveContainer>
           </CardContent>

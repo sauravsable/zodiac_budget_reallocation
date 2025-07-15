@@ -12,6 +12,7 @@ interface BudgetUploadProps {
 
 export const BudgetUpload: React.FC<BudgetUploadProps> = ({ onDataUpload, id }) => {
   const [dragActive, setDragActive] = React.useState(false);
+  const [selectedFileName, setSelectedFileName] = React.useState('')
   const [error, setError] = React.useState<string>("");
   const [loading, setLoading] = React.useState(false);
 
@@ -101,6 +102,7 @@ export const BudgetUpload: React.FC<BudgetUploadProps> = ({ onDataUpload, id }) 
   const handleDrag = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
     if (e.type === "dragenter" || e.type === "dragover") {
       setDragActive(true);
     } else if (e.type === "dragleave") {
@@ -125,6 +127,7 @@ export const BudgetUpload: React.FC<BudgetUploadProps> = ({ onDataUpload, id }) 
     (e: React.ChangeEvent<HTMLInputElement>) => {
       if (e.target.files && e.target.files[0]) {
         handleFileUpload(e.target.files[0]);
+        setSelectedFileName(e.target.files[0]?.name || '');
       }
     },
     [handleFileUpload]
@@ -132,9 +135,8 @@ export const BudgetUpload: React.FC<BudgetUploadProps> = ({ onDataUpload, id }) 
 
   return (
     <Card
-      className={`border border-gray-300 bg-white transition-colors shadow-sm ${
-        dragActive ? "border-blue-300 bg-blue-50" : "hover:border-gray-400 hover:bg-gray-50"
-      }`}
+      className={`border border-gray-300 bg-white transition-colors shadow-sm ${dragActive ? "border-blue-300 bg-blue-50" : "hover:border-gray-400 hover:bg-gray-50"
+        }`}
     >
       <CardContent className="space-y-4 py-6 px-4">
         {error && (
@@ -167,6 +169,11 @@ export const BudgetUpload: React.FC<BudgetUploadProps> = ({ onDataUpload, id }) 
                 <p className="text-xs text-gray-500">or click below to browse (max 10MB)</p>
 
                 <input type="file" accept=".csv" id={id} onChange={handleFileInputChange} className="hidden" />
+                {selectedFileName && (
+                  <p className="mt-2 text-sm text-green-600">
+                    Selected: <span className="font-medium">{selectedFileName}</span>
+                  </p>
+                )}
                 <Button
                   asChild
                   variant="outline"

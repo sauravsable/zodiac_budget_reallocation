@@ -54,8 +54,8 @@ export interface AnalysisResult extends BudgetDataZepto {
 const Index = () => {
   const [csvData, setCsvData] = useState<BudgetDataZepto[]>([]);
   const [csvData2, setCsvData2] = useState<BudgetDataZepto[]>([]);
-  const [isFirstFileUploaded, setIsFirstFileUploaded] = useState(false);
-
+  // const [isFirstFileUploaded, setIsFirstFileUploaded] = useState(false);
+  const [isUpload, setisUpload] = useState(false);
   const [totalBudget, setTotalBudget] = useState<string>("");
   const [analysisResults, setAnalysisResults] = useState<AnalysisResult[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -65,19 +65,16 @@ const Index = () => {
 
   const handleDataUpload = useCallback((data: BudgetDataZepto[]) => {
     setCsvData(data);
+    setisUpload(true);
     setError("");
-    setIsFirstFileUploaded(true);
   }, []);
 
   const handleDataUpload2 = useCallback(
     (data: BudgetDataZepto[]) => {
       setCsvData2(data);
       setError("");
-      if (isFirstFileUploaded) {
-        setActiveTab("configure");
-      }
     },
-    [isFirstFileUploaded]
+    []
   );
 
   const runAnalysis = async () => {
@@ -151,12 +148,12 @@ const Index = () => {
   const stats =
     analysisResults.length > 0
       ? {
-          totalProducts: analysisResults.length,
-          fundedProducts: analysisResults.filter((p) => p.New_Budget_Allocation > 0).length,
-          efficiencyWinners: analysisResults.filter((p) => p.isEfficiencyWinner).length,
-          totalAllocated: analysisResults.reduce((sum, p) => sum + p.New_Budget_Allocation, 0),
-          expectedIncrease: analysisResults.reduce((sum, p) => sum + p.Projected_Sales_Increase, 0),
-        }
+        totalProducts: analysisResults.length,
+        fundedProducts: analysisResults.filter((p) => p.New_Budget_Allocation > 0).length,
+        efficiencyWinners: analysisResults.filter((p) => p.isEfficiencyWinner).length,
+        totalAllocated: analysisResults.reduce((sum, p) => sum + p.New_Budget_Allocation, 0),
+        expectedIncrease: analysisResults.reduce((sum, p) => sum + p.Projected_Sales_Increase, 0),
+      }
       : null;
 
   console.log("csvdata2", csvData2);
@@ -166,18 +163,17 @@ const Index = () => {
       <Sidebar />
       <div className="h-screen w-[calc(100vw-16rem)] overflow-y-scroll">
         {/* Header */}
-        <div className="bg-card border-b border-border">
+        <div className=" border-b border-border">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <div className="flex items-center justify-between">
-              <div className="w-full sticky top-0 z-50 bg-card py-2">
+              <div className="w-full py-2">
                 <h1 className="text-3xl font-bold text-foreground text-center gap-3 w-full">Budget Allocation</h1>
                 <p className="text-muted-foreground mt-1 w-full text-center">
                   Comprehensive Budget Allocation Analysis with Optimized Efficiency Gains
                 </p>
               </div>
-              <PlatformSwitch />
 
-              {stats && (
+              {/* {stats && (
                 <div className="hidden md:flex items-center gap-6 text-sm">
                   <div className="text-center">
                     <div className="text-2xl font-bold text-blue-400">{stats.fundedProducts}</div>
@@ -192,7 +188,7 @@ const Index = () => {
                     <div className="text-muted-foreground">Total Allocated</div>
                   </div>
                 </div>
-              )}
+              )} */}
             </div>
           </div>
         </div>
@@ -207,24 +203,26 @@ const Index = () => {
 
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <div className="flex justify-center mb-6">
-              <TabsList className="grid w-full grid-cols-4 lg:w-1/2">
+              <PlatformSwitch />
+
+              {/* <TabsList className="grid w-full grid-cols-4 lg:w-1/2">
                 <TabsTrigger value="upload" className="flex items-center gap-2">
                   <Upload className="h-4 w-4" />
-                  Upload
+                  Blinkit
                 </TabsTrigger>
                 <TabsTrigger value="configure" className="flex items-center gap-2">
                   <Calculator className="h-4 w-4" />
-                  Configure
+                  Zepto
                 </TabsTrigger>
                 <TabsTrigger value="results" className="flex items-center gap-2">
                   <BarChart3 className="h-4 w-4" />
-                  Results
+                  Instamart
                 </TabsTrigger>
                 <TabsTrigger value="summary" className="flex items-center gap-2">
                   <Target className="h-4 w-4" />
                   Summary
                 </TabsTrigger>
-              </TabsList>
+              </TabsList> */}
             </div>
 
             <TabsContent value="upload" className="mt-6">
@@ -237,64 +235,193 @@ const Index = () => {
                     for both periods
                   </div>
 
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Zap className="h-5 w-5 text-yellow-400" />
+                  <Card className="relative overflow-hidden rounded-xl bg-gradient-to-br from-white to-gray-50 shadow-md border border-gray-200">
+                    <div className="absolute left-0 top-0 h-full w-1 bg-yellow-400 rounded-l-xl" />
+
+                    <CardHeader className="p-6 pb-4">
+                      <CardTitle className="flex items-center gap-3 text-2xl font-bold text-gray-900">
+                        <Zap className="h-6 w-6 text-yellow-400" />
                         Key Features
                       </CardTitle>
-                      <CardDescription>Advanced budget optimization capabilities</CardDescription>
+                      <CardDescription className="mt-2 text-base text-gray-600">
+                        Supercharge your campaigns with AI-driven performance tools
+                      </CardDescription>
+                    </CardHeader>
+
+                    <CardContent className="space-y-5 px-6 pb-6">
+                      {[
+                        {
+                          title: 'Opportunity Finder',
+                          description:
+                            'Identifies hidden growth areas across low-visibility campaigns.',
+                        },
+                        {
+                          title: 'Performance Index',
+                          description:
+                            'Combines spend, ROI, and growth potential into a single score.',
+                        },
+                        {
+                          title: 'Auto Scaling',
+                          description:
+                            'Allocates more budget to top-performers — instantly and intelligently.',
+                        },
+                        {
+                          title: 'Predictive Insights',
+                          description:
+                            'Forecasts success and suggests optimizations with AI modeling.',
+                        },
+                      ].map((feature, index) => (
+                        <div
+                          key={index}
+                          className="flex items-start gap-4 rounded-lg p-4 bg-white hover:bg-gray-50 transition"
+                        >
+                          <CheckCircle className="h-5 w-5 text-green-500 mt-1 flex-shrink-0" />
+                          <div>
+                            <h4 className="text-lg font-semibold text-gray-800">
+                              {feature.title}
+                            </h4>
+                            <p className="text-sm text-gray-600 mt-1">{feature.description}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </CardContent>
+                  </Card>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Analysis Methodology</CardTitle>
+                      <CardDescription>How the advanced algorithm works</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                      <div className="flex items-start gap-3">
-                        <CheckCircle className="h-5 w-5 text-green-400 mt-0.5" />
-                        <div>
-                          <h4 className="font-medium">Efficiency Detection</h4>
+                      <div className="space-y-3">
+                        <div className="border-l-4 border-blue-500 pl-3">
+                          <h4 className="font-medium">1. Efficiency Scoring</h4>
                           <p className="text-sm text-muted-foreground">
-                            Identifies products with increased sales and reduced spend
+                            Products with increased sales and reduced spend get bonus points
                           </p>
                         </div>
-                      </div>
-                      <div className="flex items-start gap-3">
-                        <CheckCircle className="h-5 w-5 text-green-400 mt-0.5" />
-                        <div>
-                          <h4 className="font-medium">Smart Ranking</h4>
+                        <div className="border-l-4 border-green-500 pl-3">
+                          <h4 className="font-medium">2. Weighted Ranking</h4>
                           <p className="text-sm text-muted-foreground">
-                            Advanced scoring combining efficiency and incremental performance
+                            30% efficiency + 70% incremental performance
                           </p>
                         </div>
-                      </div>
-                      <div className="flex items-start gap-3">
-                        <CheckCircle className="h-5 w-5 text-green-400 mt-0.5" />
-                        <div>
-                          <h4 className="font-medium">Dynamic Allocation</h4>
+                        <div className="border-l-4 border-purple-500 pl-3">
+                          <h4 className="font-medium">3. Smart Allocation</h4>
                           <p className="text-sm text-muted-foreground">
-                            Up to 3x budget multiplier for top efficiency winners
+                            Up to 3x budget for efficiency winners, 2.5x for top performers
                           </p>
                         </div>
-                      </div>
-                      <div className="flex items-start gap-3">
-                        <CheckCircle className="h-5 w-5 text-green-400 mt-0.5" />
-                        <div>
-                          <h4 className="font-medium">ROI Projections</h4>
+                        <div className="border-l-4 border-orange-500 pl-3">
+                          <h4 className="font-medium">4. ROI Projection</h4>
                           <p className="text-sm text-muted-foreground">
-                            Forecasts sales increases and portfolio returns
+                            Forecasts sales increases based on allocation multipliers
                           </p>
                         </div>
                       </div>
                     </CardContent>
                   </Card>
+
                 </div>
               </div>
 
-              {csvData.length > 0 && (
-                <div className="mt-6">
-                  <DataPreview data={csvData} />
+              {isUpload && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+                  <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl p-6 relative animate-fade-in">
+                    {/* Close Button (optional) */}
+                    <button
+                      onClick={() => setisUpload(!isUpload)}
+                      className="absolute top-1 right-2 text-lg text-gray-400 hover:text-gray-600 transition"
+                    >
+                      <span className="sr-only">Close</span>
+                      &times;
+                    </button>
+
+                    {/* Upload Component */}
+                    <div className="mb-6">
+                      <BudgetUpload id="file-upload-2" onDataUpload={handleDataUpload2} />
+                    </div>
+
+                    <div className="bg-white shadow-lg border border-gray-200 rounded-xl p-6 space-y-6">
+                      {/* Header */}
+                      <div>
+                        <div className="flex items-center gap-2 text-2xl font-bold text-gray-800">
+                          <DollarSign className="h-6 w-6 text-green-500" />
+                          Budget Configuration
+                        </div>
+                        <p className="text-sm text-gray-500 mt-1">
+                          Set your total budget for reallocation analysis
+                        </p>
+                      </div>
+
+                      {/* Budget Input */}
+                      <div className="space-y-1">
+                        <Label htmlFor="budget" className="text-sm font-medium text-gray-700">
+                          Total Budget (in Lakhs)
+                        </Label>
+                        <div className="relative mt-1">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">₹</span>
+                          <Input
+                            id="budget"
+                            type="number"
+                            placeholder="e.g., 10.5"
+                            value={totalBudget}
+                            onChange={(e) => setTotalBudget(e.target.value)}
+                            className="pl-6"
+                          />
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1">
+                          You entered: ₹{totalBudget ? parseFloat(totalBudget).toFixed(2) : "0.00"} Lakhs
+                        </p>
+                      </div>
+
+                      {/* CSV Summary */}
+                      {csvData.length > 0 && (
+                        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                          <h4 className="text-base font-semibold text-gray-800 mb-3">Data Summary</h4>
+                          <div className="grid grid-cols-2 gap-4 text-sm text-gray-700">
+                            <div>
+                              <span className="text-gray-500">Products:</span>
+                              <span className="ml-2 font-medium">{csvData.length}</span>
+                            </div>
+                            <div>
+                              <span className="text-gray-500">Current Total Sales:</span>
+                              <span className="ml-2 font-medium">
+                                ₹{csvData.reduce((sum, p) => sum + Number(p["Revenue"]), 0).toFixed(0)}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Run Button */}
+                      <Button
+                        onClick={runAnalysis}
+                        disabled={!csvData.length || !totalBudget || isAnalyzing}
+                        className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-sm font-semibold py-2.5"
+                        size="lg"
+                      >
+                        {isAnalyzing ? "Analyzing..." : "Run Budget Analysis"}
+                        <Calculator className="ml-2 h-4 w-4" />
+                      </Button>
+
+                      {/* Progress Bar */}
+                      {isAnalyzing && (
+                        <div className="space-y-2">
+                          <Progress value={progress} className="w-full" />
+                          <p className="text-sm text-center text-gray-500">
+                            Processing budget allocation algorithm...
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
+                  </div>
                 </div>
               )}
+
             </TabsContent>
 
-            <TabsContent value="configure" className="mt-6">
+            {/* <TabsContent value="configure" className="mt-6">
               <div className="flex justify-center">
                 <div className="w-full max-w-4xl">
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -399,7 +526,7 @@ const Index = () => {
                   </div>
                 </div>
               </div>
-            </TabsContent>
+            </TabsContent> */}
 
             <TabsContent value="results" className="mt-6">
               <div className="flex justify-center">
@@ -427,10 +554,7 @@ const Index = () => {
                   )}
                 </div>
               </div>
-            </TabsContent>
-
-            <TabsContent value="summary" className="mt-6">
-              <div className="flex justify-center">
+              <div className="flex justify-center mt-10">
                 <div className="w-full max-w-6xl">
                   {analysisResults.length > 0 ? (
                     <ExecutiveSummary results={analysisResults} totalBudget={parseFloat(totalBudget)} />
@@ -447,6 +571,25 @@ const Index = () => {
                 </div>
               </div>
             </TabsContent>
+
+            {/* <TabsContent value="summary" className="mt-6">
+              <div className="flex justify-center">
+                <div className="w-full max-w-6xl">
+                  {analysisResults.length > 0 ? (
+                    <ExecutiveSummary results={analysisResults} totalBudget={parseFloat(totalBudget)} />
+                  ) : (
+                    <Card>
+                      <CardContent className="py-12 text-center">
+                        <Target className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                        <p className="text-muted-foreground">
+                          Executive summary will appear here after running the analysis.
+                        </p>
+                      </CardContent>
+                    </Card>
+                  )}
+                </div>
+              </div>
+            </TabsContent> */}
           </Tabs>
         </div>
       </div>

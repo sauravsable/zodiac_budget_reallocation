@@ -24,7 +24,7 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ results, total
   
   // Chart data
   const topProductsChart = results.slice(0, 10).map(p => ({
-    name: p['ProductName'].length > 15 ? p['ProductName'].substring(0, 15) + '...' : p['ProductName'],
+    name: p['ProductName']?.length > 15 ? p['ProductName'].substring(0, 15) + '...' : p['ProductName'],
     allocation: p.New_Budget_Allocation * 100,
     multiplier: p.Budget_Multiplier,
     isEfficiency: p.isEfficiencyWinner

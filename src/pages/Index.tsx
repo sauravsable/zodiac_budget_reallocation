@@ -7,7 +7,7 @@ import {
   AlertCircle,
   CheckCircle,
   TrendingUp,
-  DollarSign,
+  Currency,
   Target,
   Zap,
 } from "lucide-react";
@@ -65,13 +65,14 @@ const Index = () => {
 
   const handleDataUpload = useCallback((data: BudgetDataZepto[]) => {
     setCsvData(data);
-    setisUpload(true);
     setError("");
   }, []);
 
   const handleDataUpload2 = useCallback(
     (data: BudgetDataZepto[]) => {
       setCsvData2(data);
+      setisUpload(true);
+
       setError("");
     },
     []
@@ -233,11 +234,12 @@ const Index = () => {
               <div className="flex justify-center">
                 <div className="w-full  space-y-6">
                   <div className="w-1/2 mx-auto">
-                    <BudgetUpload id="file-upload-1" onDataUpload={handleDataUpload} />
+                    <BudgetUpload id="file-upload-2" onDataUpload={handleDataUpload2} />
+
                   </div>
 
                   <div className="text-xs text-gray-400 text-center">
-                    <span className="font-medium">Requirement:</span> Upload a sheet dated earlier than the current one.
+                    <span className="font-medium">Requirement:</span> Upload a sheet.
                   </div>
 
 
@@ -264,7 +266,7 @@ const Index = () => {
                         {
                           title: 'Auto Scaling',
                           description:
-                          'Allocates more budget to top-performers — instantly and intelligently.',
+                            'Allocates more budget to top-performers — instantly and intelligently.',
                         },
                         {
                           title: 'Performance Index',
@@ -345,14 +347,14 @@ const Index = () => {
 
                     {/* Upload Component */}
                     <div className="mb-6">
-                      <BudgetUpload id="file-upload-2" onDataUpload={handleDataUpload2} />
+                      <BudgetUpload id="file-upload-1" onDataUpload={handleDataUpload} />
                     </div>
 
                     <div className="bg-white shadow-lg border border-gray-200 rounded-xl p-2 space-y-4">
                       {/* Header */}
                       <div>
                         <div className="flex items-center gap-2 text-2xl font-bold text-gray-800">
-                          <DollarSign className="h-6 w-6 text-green-500" />
+                          <Currency className="h-6 w-6 text-green-500" />
                           Budget Configuration
                         </div>
                         <p className="text-sm text-gray-500 mt-1">
@@ -435,7 +437,7 @@ const Index = () => {
                     <Card>
                       <CardHeader>
                         <CardTitle className="flex items-center gap-2">
-                          <DollarSign className="h-5 w-5 text-green-400" />
+                          <Currency className="h-5 w-5 text-green-400" />
                           Budget Configuration
                         </CardTitle>
                         <CardDescription>Set your total budget for reallocation analysis</CardDescription>

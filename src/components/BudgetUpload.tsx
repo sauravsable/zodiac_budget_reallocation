@@ -1,3 +1,5 @@
+
+import * as XLSX from "xlsx";
 import React, { useCallback } from "react";
 import { Upload, FileText, AlertCircle } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -77,8 +79,11 @@ export const BudgetUpload: React.FC<BudgetUploadProps> = ({ onDataUpload, id }) 
 
   const handleFileUpload = useCallback(
     async (file: File) => {
-      if (file.type !== "text/csv" && !file.name.endsWith(".csv")) {
-        setError("Please upload a CSV file");
+      const isCSV = file.type === "text/csv" || file.name.endsWith(".csv");
+      const isXLSX = file.name.endsWith(".xlsx") || file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+
+      if (!isCSV && !isXLSX) {
+        setError("Please upload a CSV or XLSX file");
         return;
       }
 
@@ -86,12 +91,23 @@ export const BudgetUpload: React.FC<BudgetUploadProps> = ({ onDataUpload, id }) 
       setError("");
 
       try {
-        const text = await file.text();
-        const data = parseCSV(text);
+        let data: any[] = [];
+
+        if (isCSV) {
+          const text = await file.text();
+          data = parseCSV(text); // assume your parseCSV is defined
+        } else if (isXLSX) {
+          const arrayBuffer = await file.arrayBuffer();
+          const workbook = XLSX.read(arrayBuffer, { type: "array" });
+          const sheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[sheetName];
+          data = XLSX.utils.sheet_to_json(worksheet);
+        }
+
         onDataUpload(data);
-        console.log(`Successfully loaded ${data.length} products from CSV`);
+        console.log(`Successfully loaded ${data.length} products from file`);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to parse CSV file");
+        setError(err instanceof Error ? err.message : "Failed to parse file");
       } finally {
         setLoading(false);
       }
@@ -168,7 +184,7 @@ export const BudgetUpload: React.FC<BudgetUploadProps> = ({ onDataUpload, id }) 
                 <p className="text-sm text-gray-700">Drag & drop your CSV here</p>
                 <p className="text-xs text-gray-500">or click below to browse (max 10MB)</p>
 
-                <input type="file" accept=".csv" id={id} onChange={handleFileInputChange} className="hidden" />
+                <input type="file" id={id} onChange={handleFileInputChange} className="hidden" />
                 {selectedFileName && (
                   <p className="mt-2 text-sm text-green-600">
                     Selected: <span className="font-medium">{selectedFileName}</span>

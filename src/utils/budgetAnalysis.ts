@@ -2,7 +2,7 @@
 import { BudgetDataZepto, BudgetDataZeptoReturn, AnalysisResult } from '@/pages/Index';
 
 export function mergeBudgetData(
-  data1: BudgetDataZepto[], 
+  data1: BudgetDataZepto[],
   data2: BudgetDataZepto[]
 ): BudgetDataZeptoReturn[] {
   const map1 = new Map<string, BudgetDataZepto>();
@@ -14,17 +14,17 @@ export function mergeBudgetData(
 
   return data2.map(item2 => {
     const key = `${item2.ProductID}|${item2.Campaign_id}`;
-    const item1 = map1.get(key);
+    const item1 = map1.get(key)?? {};
 
     return {
-      'ProductID' : item2['ProductID'],
+      'ProductID': item2['ProductID'],
       'ProductName': item2['ProductName'],
       'Campaign_id': item2['Campaign_id'],
       'Total Sales in Lakhs - Period 1': Number(item1['Revenue'] ?? 0),
       'Total Spend - Period 1': Number(item1['Spend'] ?? 0),
       'ROI - Period 1': Number(item1['Roas'] ?? 0),
-      'Total Sales in Lakhs - Period 2': Number(item2['Revenue']),
-      'Total Spend - Period 2':  Number(item2['Spend']),
+      'Total Sales in Lakhs - Period 2': Number(item2['Revenue'] ?? 0),
+      'Total Spend - Period 2': Number(item2['Spend']),
       'ROI - Period 2': Number(item2['Roas']),
     };
   });
@@ -33,7 +33,7 @@ export function mergeBudgetData(
 export function processCSVData(data: BudgetDataZepto[], totalBudgetLakhs: number): AnalysisResult[] {
 
   console.log("data in processCSV Data", data);
-  
+
   console.log(`Processing ${data.length} products with ₹${totalBudgetLakhs} Lakhs budget`);
 
   // Calculate incremental metrics
@@ -43,14 +43,14 @@ export function processCSVData(data: BudgetDataZepto[], totalBudgetLakhs: number
 
     // Improved incremental ROI calculation
     const incrementalROIScore = calculateIncrementalROIScore(incrementalSales, incrementalSpend);
-    
+
     // Original incremental ROI for reference
-    const originalIncrementalROI = incrementalSpend !== 0 ? 
-      incrementalSales / incrementalSpend : 
+    const originalIncrementalROI = incrementalSpend !== 0 ?
+      incrementalSales / incrementalSpend :
       (incrementalSales > 0 ? Infinity : 0);
 
     // Current ROI calculation
-    const currentROI = product['Total Spend - Period 2'] > 0 ? 
+    const currentROI = product['Total Spend - Period 2'] > 0 ?
       product['Total Sales in Lakhs - Period 2'] / product['Total Spend - Period 2'] : 0;
 
     // Combined efficiency score
@@ -78,7 +78,7 @@ export function processCSVData(data: BudgetDataZepto[], totalBudgetLakhs: number
 
     // Final ranking score with improvement bonus
     let rankingScore = (0.3 * normEfficiency) + (0.7 * normIncrementalROI);
-    
+
     // Add bonus for efficiency winners
     if (product.isEfficiencyWinner) {
       rankingScore += 0.1; // 10% bonus
@@ -150,7 +150,7 @@ export function processCSVData(data: BudgetDataZepto[], totalBudgetLakhs: number
   });
 
   console.log(`Budget allocation complete. Remaining: ₹${remainingBudget.toFixed(2)} Lakhs`);
-  
+
   return results;
 }
 

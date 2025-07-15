@@ -5,7 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ScatterChart, Scatter, PieChart, Pie, Cell } from 'recharts';
-import { TrendingUp, Award, DollarSign, Target, Crown } from 'lucide-react';
+import { TrendingUp, Award, Currency, Target, Crown } from 'lucide-react';
 import { AnalysisResult } from '@/pages/Index';
 
 interface AnalysisResultsProps {
@@ -73,7 +73,7 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ results, total
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
-              <DollarSign className="h-5 w-5 text-green-500" />
+              <Currency className="h-5 w-5 text-green-500" />
               <div>
                 <div className="text-2xl font-bold text-green-600">₹{(totalAllocated).toFixed(0)}</div>
                 <div className="text-sm text-gray-600">Total Allocated</div>

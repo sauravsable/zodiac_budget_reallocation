@@ -68,15 +68,12 @@ const Index = () => {
     setError("");
   }, []);
 
-  const handleDataUpload2 = useCallback(
-    (data: BudgetDataZepto[]) => {
-      setCsvData2(data);
-      setisUpload(true);
+  const handleDataUpload2 = useCallback((data: BudgetDataZepto[]) => {
+    setCsvData2(data);
+    setisUpload(true);
 
-      setError("");
-    },
-    []
-  );
+    setError("");
+  }, []);
 
   const runAnalysis = async () => {
     if (!csvData.length || !totalBudget) {
@@ -149,12 +146,12 @@ const Index = () => {
   const stats =
     analysisResults.length > 0
       ? {
-        totalProducts: analysisResults.length,
-        fundedProducts: analysisResults.filter((p) => p.New_Budget_Allocation > 0).length,
-        efficiencyWinners: analysisResults.filter((p) => p.isEfficiencyWinner).length,
-        totalAllocated: analysisResults.reduce((sum, p) => sum + p.New_Budget_Allocation, 0),
-        expectedIncrease: analysisResults.reduce((sum, p) => sum + p.Projected_Sales_Increase, 0),
-      }
+          totalProducts: analysisResults.length,
+          fundedProducts: analysisResults.filter((p) => p.New_Budget_Allocation > 0).length,
+          efficiencyWinners: analysisResults.filter((p) => p.isEfficiencyWinner).length,
+          totalAllocated: analysisResults.reduce((sum, p) => sum + p.New_Budget_Allocation, 0),
+          expectedIncrease: analysisResults.reduce((sum, p) => sum + p.Projected_Sales_Increase, 0),
+        }
       : null;
 
   console.log("csvdata2", csvData2);
@@ -203,12 +200,11 @@ const Index = () => {
           )}
 
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            {
-              activeTab === 'upload' && (
-                <div className="flex justify-center mb-6">
-                  <PlatformSwitch />
+            {activeTab === "upload" && (
+              <div className="flex justify-center mb-6">
+                <PlatformSwitch />
 
-                  {/* <TabsList className="grid w-full grid-cols-4 lg:w-1/2">
+                {/* <TabsList className="grid w-full grid-cols-4 lg:w-1/2">
                 <TabsTrigger value="upload" className="flex items-center gap-2">
                   <Upload className="h-4 w-4" />
                   Blinkit
@@ -226,22 +222,19 @@ const Index = () => {
                   Summary
                 </TabsTrigger>
               </TabsList> */}
-                </div>
-              )
-            }
+              </div>
+            )}
 
             <TabsContent value="upload" className="mt-6">
               <div className="flex justify-center">
                 <div className="w-full  space-y-6">
                   <div className="w-1/2 mx-auto">
                     <BudgetUpload id="file-upload-2" onDataUpload={handleDataUpload2} />
-
                   </div>
 
                   <div className="text-xs text-gray-400 text-center">
                     <span className="font-medium">Requirement:</span> Upload a sheet.
                   </div>
-
 
                   <Card className="relative mx-auto w-5/6  overflow-hidden rounded-xl bg-gradient-to-br from-white to-gray-50 shadow-md border border-gray-200">
                     <div className="absolute left-0 top-0 h-full w-1 bg-yellow-400 rounded-l-xl" />
@@ -259,24 +252,20 @@ const Index = () => {
                     <CardContent className=" flex flex-row flex-wrap items-start justify-evenly px-6 pb-6">
                       {[
                         {
-                          title: 'Opportunity Finder',
-                          description:
-                            'Identifies hidden growth areas across low-visibility campaigns.',
+                          title: "Opportunity Finder",
+                          description: "Identifies hidden growth areas across low-visibility campaigns.",
                         },
                         {
-                          title: 'Auto Scaling',
-                          description:
-                            'Allocates more budget to top-performers — instantly and intelligently.',
+                          title: "Auto Scaling",
+                          description: "Allocates more budget to top-performers — instantly and intelligently.",
                         },
                         {
-                          title: 'Performance Index',
-                          description:
-                            'Combines spend, ROI, and growth potential into a single score.',
+                          title: "Performance Index",
+                          description: "Combines spend, ROI, and growth potential into a single score.",
                         },
                         {
-                          title: 'Predictive Insights',
-                          description:
-                            'Forecasts success and suggests optimizations with AI modeling.',
+                          title: "Predictive Insights",
+                          description: "Forecasts success and suggests optimizations with AI modeling.",
                         },
                       ].map((feature, index) => (
                         <div
@@ -285,9 +274,7 @@ const Index = () => {
                         >
                           <CheckCircle className="h-5 w-5 text-green-500 mt-1 flex-shrink-0" />
                           <div>
-                            <h4 className="text-lg font-semibold text-gray-800">
-                              {feature.title}
-                            </h4>
+                            <h4 className="text-lg font-semibold text-gray-800">{feature.title}</h4>
                             <p className="text-sm text-gray-600 mt-1">{feature.description}</p>
                           </div>
                         </div>
@@ -309,9 +296,7 @@ const Index = () => {
                         </div>
                         <div className="border-l-4 border-green-500 pl-3 w-1/2">
                           <h4 className="font-medium">2. Weighted Ranking</h4>
-                          <p className="text-sm text-muted-foreground">
-                            30% efficiency + 70% incremental performance
-                          </p>
+                          <p className="text-sm text-muted-foreground">30% efficiency + 70% incremental performance</p>
                         </div>
                         <div className="border-l-4 border-purple-500 pl-3 w-1/2">
                           <h4 className="font-medium">3. Smart Allocation</h4>
@@ -328,8 +313,6 @@ const Index = () => {
                       </div>
                     </CardContent>
                   </Card>
-
-
                 </div>
               </div>
 
@@ -357,9 +340,7 @@ const Index = () => {
                           <Currency className="h-6 w-6 text-green-500" />
                           Budget Configuration
                         </div>
-                        <p className="text-sm text-gray-500 mt-1">
-                          Set your total budget for reallocation analysis
-                        </p>
+                        <p className="text-sm text-gray-500 mt-1">Set your total budget for reallocation analysis</p>
                       </div>
 
                       {/* Budget Input */}
@@ -417,17 +398,13 @@ const Index = () => {
                       {isAnalyzing && (
                         <div className="space-y-2">
                           <Progress value={progress} className="w-full" />
-                          <p className="text-sm text-center text-gray-500">
-                            Processing budget allocation algorithm...
-                          </p>
+                          <p className="text-sm text-center text-gray-500">Processing budget allocation algorithm...</p>
                         </div>
                       )}
                     </div>
-
                   </div>
                 </div>
               )}
-
             </TabsContent>
 
             {/* <TabsContent value="configure" className="mt-6">
@@ -564,8 +541,10 @@ const Index = () => {
                 </div>
               </div>
               {csvData.length > 0 && (
-                <div className="m-4">
-                  <DataPreview data={mergeBudgetData(csvData, csvData2)} />
+                <div className="flex justify-center mt-5">
+                  <div className="w-full max-w-6xl">
+                    <DataPreview data={mergeBudgetData(csvData, csvData2)} />
+                  </div>
                 </div>
               )}
               <div className="flex justify-center mt-10">

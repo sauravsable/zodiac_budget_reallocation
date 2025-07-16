@@ -14,23 +14,23 @@ export function mergeBudgetData(
 
   return data2.map(item2 => {
     const key = `${item2.ProductID}|${item2.Campaign_id}`;
-    const item1 = map1.get(key)?? {};
+    const item1 = map1.get(key) ?? {};
 
     return {
       'ProductID': item2['ProductID'],
       'ProductName': item2['ProductName'],
       'Campaign_id': item2['Campaign_id'],
-      'Total Sales in Lakhs - Period 1': Number(item1['Revenue'] ?? 0),
+      'Total Sales - Period 1': Number(item1['Revenue'] ?? 0),
       'Total Spend - Period 1': Number(item1['Spend'] ?? 0),
       'ROI - Period 1': Number(item1['Roas'] ?? 0),
-      'Total Sales in Lakhs - Period 2': Number(item2['Revenue'] ?? 0),
+      'Total Sales - Period 2': Number(item2['Revenue'] ?? 0),
       'Total Spend - Period 2': Number(item2['Spend']),
       'ROI - Period 2': Number(item2['Roas']),
     };
   });
 }
 
-export function processCSVData(data: BudgetDataZepto[], totalBudgetLakhs: number): AnalysisResult[] {
+export function processCSVData(data: BudgetDataZeptoReturn[], totalBudgetLakhs: number): AnalysisResult[] {
 
   console.log("data in processCSV Data", data);
 
@@ -38,20 +38,18 @@ export function processCSVData(data: BudgetDataZepto[], totalBudgetLakhs: number
 
   // Calculate incremental metrics
   const processedData = data.map(product => {
-    const incrementalSales = product['Total Sales in Lakhs - Period 2'] - product['Total Sales in Lakhs - Period 1'];
+    const incrementalSales = product['Total Sales - Period 2'] - product['Total Sales - Period 1'];
     const incrementalSpend = product['Total Spend - Period 2'] - product['Total Spend - Period 1'];
 
     // Improved incremental ROI calculation
     const incrementalROIScore = calculateIncrementalROIScore(incrementalSales, incrementalSpend);
 
     // Original incremental ROI for reference
-    const originalIncrementalROI = incrementalSpend !== 0 ?
-      incrementalSales / incrementalSpend :
-      (incrementalSales > 0 ? Infinity : 0);
+    const originalIncrementalROI = incrementalSpend !== 0 ? incrementalSales / incrementalSpend : 0;
 
     // Current ROI calculation
     const currentROI = product['Total Spend - Period 2'] > 0 ?
-      product['Total Sales in Lakhs - Period 2'] / product['Total Spend - Period 2'] : 0;
+      product['Total Sales - Period 2'] / product['Total Spend - Period 2'] : 0;
 
     // Combined efficiency score
     const efficiencyScore = (0.4 * currentROI) + (0.6 * incrementalROIScore);
@@ -60,10 +58,10 @@ export function processCSVData(data: BudgetDataZepto[], totalBudgetLakhs: number
       ...product,
       Incremental_Sales: incrementalSales,
       Incremental_Spend: incrementalSpend,
-      Original_Incremental_ROI: originalIncrementalROI,
-      Incremental_ROI_Score: incrementalROIScore,
-      Current_ROI: currentROI,
-      Efficiency_Score: efficiencyScore,
+      Original_Incremental_ROI: Number(originalIncrementalROI.toFixed(2)),
+      Incremental_ROI_Score: Number(incrementalROIScore.toFixed(2)),
+      Current_ROI: Number(currentROI.toFixed(2)),
+      Efficiency_Score: Number(efficiencyScore.toFixed(2)),
       isEfficiencyWinner: incrementalSales > 0 && incrementalSpend <= 0
     };
   });
@@ -86,11 +84,11 @@ export function processCSVData(data: BudgetDataZepto[], totalBudgetLakhs: number
 
     return {
       ...product,
-      Ranking_Score: rankingScore,
+      Ranking_Score: Number(rankingScore.toFixed(2)),
       New_Budget_Allocation: 0,
       Budget_Multiplier: 1.0,
       Projected_Sales_Increase: 0,
-      Projected_New_Sales: product['Total Sales in Lakhs - Period 2'],
+      Projected_New_Sales: product['Total Sales - Period 2'],
       Projected_ROI: 0
     };
   });
@@ -134,7 +132,7 @@ export function processCSVData(data: BudgetDataZepto[], totalBudgetLakhs: number
     const budgetMultiplier = maxAllocation / Math.max(currentSpend, 0.01);
     const projectedSalesIncrease = budgetMultiplier > 1 && product.Incremental_Sales > 0 ?
       product.Incremental_Sales * (budgetMultiplier - 1) : 0;
-    const projectedNewSales = product['Total Sales in Lakhs - Period 2'] + projectedSalesIncrease;
+    const projectedNewSales = product['Total Sales - Period 2'] + projectedSalesIncrease;
     const projectedROI = maxAllocation > 0 ? projectedNewSales / maxAllocation : 0;
 
     remainingBudget -= maxAllocation;
@@ -142,10 +140,10 @@ export function processCSVData(data: BudgetDataZepto[], totalBudgetLakhs: number
     return {
       ...product,
       New_Budget_Allocation: maxAllocation,
-      Budget_Multiplier: budgetMultiplier,
-      Projected_Sales_Increase: projectedSalesIncrease,
-      Projected_New_Sales: projectedNewSales,
-      Projected_ROI: projectedROI
+      Budget_Multiplier: Number(budgetMultiplier.toFixed(2)),
+      Projected_Sales_Increase: Number(projectedSalesIncrease.toFixed(2)),
+      Projected_New_Sales: Number(projectedNewSales.toFixed(2)),
+      Projected_ROI: Number(projectedROI.toFixed(2))
     } as AnalysisResult;
   });
 

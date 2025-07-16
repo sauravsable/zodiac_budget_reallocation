@@ -4,10 +4,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Eye, TrendingUp, TrendingDown } from 'lucide-react';
-import { BudgetData } from '@/pages/Index';
+import { BudgetDataZeptoReturn } from '@/pages/Index';
 
 interface DataPreviewProps {
-  data: BudgetData[];
+  data: BudgetDataZeptoReturn[];
 }
 
 export const DataPreview: React.FC<DataPreviewProps> = ({ data }) => {
@@ -15,10 +15,10 @@ export const DataPreview: React.FC<DataPreviewProps> = ({ data }) => {
 
   const stats = {
     totalProducts: data.length,
-    totalSalesP2: data.reduce((sum, p) => sum + p['Total Sales in Lakhs - Period 2'], 0),
+    totalSalesP2: data.reduce((sum, p) => sum + p['Total Sales in - Period 2'], 0),
     totalSpendP2: data.reduce((sum, p) => sum + p['Total Spend - Period 2'], 0),
     positiveTrend: data.filter(p => 
-      p['Total Sales in Lakhs - Period 2'] > p['Total Sales in Lakhs - Period 1']
+      p['Total Sales in - Period 2'] > p['Total Sales in - Period 1']
     ).length
   };
 
@@ -69,7 +69,7 @@ export const DataPreview: React.FC<DataPreviewProps> = ({ data }) => {
             </TableHeader>
             <TableBody>
               {previewData.map((product, index) => {
-                const salesChange = product['Total Sales in Lakhs - Period 2'] - product['Total Sales in Lakhs - Period 1'];
+                const salesChange = product['Total Sales in - Period 2'] - product['Total Sales in - Period 1'];
                 const isGrowing = salesChange > 0;
                 
                 return (
@@ -80,8 +80,8 @@ export const DataPreview: React.FC<DataPreviewProps> = ({ data }) => {
                         <div className="text-sm text-gray-500">{product['ProductID']}</div>
                       </div>
                     </TableCell>
-                    <TableCell className="text-right">₹{(product['Total Sales in Lakhs - Period 1'])}</TableCell>
-                    <TableCell className="text-right">₹{(product['Total Sales in Lakhs - Period 2'])}</TableCell>
+                    <TableCell className="text-right">₹{(product['Total Sales in - Period 1'])}</TableCell>
+                    <TableCell className="text-right">₹{(product['Total Sales in - Period 2'])}</TableCell>
                     <TableCell className="text-right">₹{(product['Total Spend - Period 2'])}</TableCell>
                     <TableCell className="text-right">{product['ROI - Period 2']}x</TableCell>
                     <TableCell>

@@ -35,7 +35,18 @@ export interface BudgetDataZepto {
   Roas: number;
 }
 
-export interface AnalysisResult extends BudgetDataZepto {
+export interface BudgetDataZeptoReturn {
+  'ProductID': string,
+  'ProductName': string,
+  'Campaign_id': string,
+  'Total Sales - Period 1': number,
+  'Total Spend - Period 1': number,
+  'ROI - Period 1': number,
+  'Total Sales - Period 2': number,
+  'Total Spend - Period 2': number,
+  'ROI - Period 2': number,
+}
+export interface AnalysisResult extends BudgetDataZeptoReturn {
   Incremental_Sales: number;
   Incremental_Spend: number;
   Original_Incremental_ROI: number;
@@ -110,11 +121,7 @@ const Index = () => {
       }
 
       const mergedresult = mergeBudgetData(csvData, csvData2);
-
       const results = processCSVData(mergedresult, budget);
-
-      console.log("results", results);
-
       setAnalysisResults(results);
       setActiveTab("results");
     } catch (err) {

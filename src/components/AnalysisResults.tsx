@@ -28,14 +28,14 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ results, total
     allocation: p.New_Budget_Allocation,
     multiplier: p.Budget_Multiplier,
     isEfficiency: p.isEfficiencyWinner
-  }));
+  })).filter((item) => item.allocation > 0);
 
   const efficiencyChart = results.map(p => ({
     efficiency: p.Efficiency_Score,
     incremental: p.Incremental_ROI_Score,
     allocation: p.New_Budget_Allocation,
     name: p['ProductName']
-  }));
+  })).filter((item) => item.allocation > 0);
 
   const budgetDistribution = [
     { name: 'Allocated', value: totalAllocated, color: '#8884d8' },

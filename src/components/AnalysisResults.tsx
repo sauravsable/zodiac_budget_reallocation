@@ -7,6 +7,7 @@ import { Progress } from '@/components/ui/progress';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ScatterChart, Scatter, PieChart, Pie, Cell } from 'recharts';
 import { TrendingUp, Award, Currency, Target, Crown } from 'lucide-react';
 import { AnalysisResult } from '@/pages/Index';
+import { usePlatformStore } from '@/utils/zusStore';
 
 interface AnalysisResultsProps {
   results: AnalysisResult[];
@@ -14,17 +15,22 @@ interface AnalysisResultsProps {
 }
 
 export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ results, totalBudget }) => {
+
   const fundedProducts = results.filter(p => p.New_Budget_Allocation > 0);
   const efficiencyWinners = results.filter(p => p.isEfficiencyWinner);
-  
+  const platform = usePlatformStore((state) => state.platform);
+
+
   const totalAllocated = fundedProducts.reduce((sum, p) => sum + p.New_Budget_Allocation, 0);
   const expectedIncrease = fundedProducts.reduce((sum, p) => sum + p.Projected_Sales_Increase, 0);
-  
+
   const utilizationPercentage = (totalAllocated / totalBudget) * 100;
-  
+
   // Chart data
   const topProductsChart = results.slice(0, 10).map(p => ({
-    name: p['ProductName']?.length > 15 ? p['ProductName'].substring(0, 15) + '...' : p['ProductName'],
+    name: (p['ProductName'] || p['Campaign Name'])?.length > 15
+      ? (p['ProductName'] || p['Campaign Name']).substring(0, 15) + '...'
+      : (p['ProductName'] || p['Campaign Name']),
     allocation: p.New_Budget_Allocation,
     multiplier: p.Budget_Multiplier,
     isEfficiency: p.isEfficiencyWinner
@@ -34,7 +40,7 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ results, total
     efficiency: p.Efficiency_Score,
     incremental: p.Incremental_ROI_Score,
     allocation: p.New_Budget_Allocation,
-    name: p['ProductName']
+    name: p['ProductName'] || p['Campaign Name'],
   }));
 
   const budgetDistribution = [
@@ -124,23 +130,23 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ results, total
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={topProductsChart}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis 
-                  dataKey="name" 
-                  angle={-45} 
-                  textAnchor="end" 
+                <XAxis
+                  dataKey="name"
+                  angle={-45}
+                  textAnchor="end"
                   height={80}
                   fontSize={12}
                 />
                 <YAxis />
-                <Tooltip 
+                <Tooltip
                   formatter={(value) => [
                     `₹${typeof value === 'number' ? value.toFixed(0) : value}`,
                     'Budget Allocation'
                   ]}
-                  labelFormatter={(label) => `Product: ${label}`}
+                  labelFormatter={(label) => `${platform === 'Blinkit' ? 'Campaign' : 'Product'}: ${label}`}
                 />
-                <Bar 
-                  dataKey="allocation" 
+                <Bar
+                  dataKey="allocation"
                   fill="#8884d8"
                   name="Budget Allocation (₹K)"
                 />
@@ -191,30 +197,30 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ results, total
           <ResponsiveContainer width="100%" height={400}>
             <ScatterChart data={efficiencyChart}>
               <CartesianGrid />
-              <XAxis 
-                type="number" 
-                dataKey="efficiency" 
+              <XAxis
+                type="number"
+                dataKey="efficiency"
                 name="Efficiency Score"
                 domain={[0, 'dataMax']}
               />
-              <YAxis 
-                type="number" 
-                dataKey="incremental" 
+              <YAxis
+                type="number"
+                dataKey="incremental"
                 name="Incremental ROI Score"
                 domain={[0, 'dataMax']}
               />
-              <Tooltip 
+              <Tooltip
                 cursor={{ strokeDasharray: '3 3' }}
                 formatter={(value) => [typeof value === 'number' ? value.toFixed(2) : value]}
                 labelFormatter={(label, payload) => {
                   if (payload && payload.length > 0) {
-                    return `Product: ${payload[0]?.payload?.name}`;
+                    return `${platform === 'Blinkit' ? 'Campaign' : 'Product'}: ${payload[0]?.payload?.name}`;
                   }
                   return '';
                 }}
               />
-              <Scatter 
-                dataKey="allocation" 
+              <Scatter
+                dataKey="allocation"
                 fill="#8884d8"
                 name="Budget Allocation (₹K)"
               />
@@ -237,7 +243,7 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ results, total
               <TableHeader>
                 <TableRow>
                   <TableHead>Rank</TableHead>
-                  <TableHead>Product</TableHead>
+                  <TableHead>{`${platform === "Blinkit" ? 'Campaign' : 'Product'}`}</TableHead>
                   <TableHead className="text-right">Current Sales</TableHead>
                   <TableHead className="text-right">Sales Change</TableHead>
                   <TableHead className="text-right">Spend Change</TableHead>
@@ -254,11 +260,11 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ results, total
                     <TableCell className="font-medium">#{index + 1}</TableCell>
                     <TableCell>
                       <div>
-                        <div className="font-medium">{product['ProductName']}</div>
-                        <div className="text-sm text-gray-500">{product['ProductID']}</div>
+                        <div className="font-medium">{product['ProductName'] || product['Campaign Name']}</div>
+                        <div className="text-sm text-gray-500">{product['ProductID'] || product['Targeting Value']}</div>
                       </div>
                     </TableCell>
-                    <TableCell className="text-right">₹{(product['Total Sales in Lakhs - Period 2'])}</TableCell>
+                    <TableCell className="text-right">₹{(product['Total Sales - Period 2'])}</TableCell>
                     <TableCell className="text-right">
                       <span className={product.Incremental_Sales > 0 ? 'text-green-600' : 'text-red-600'}>
                         {product.Incremental_Sales > 0 ? '+' : ''}₹{(product.Incremental_Sales)}
@@ -266,12 +272,12 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ results, total
                     </TableCell>
                     <TableCell className="text-right">
                       <span className={product.Incremental_Spend < 0 ? 'text-green-600' : 'text-red-600'}>
-                        ₹{(product.Incremental_Spend)}
+                        ₹{(product.Incremental_Spend?.toFixed(2))}
                       </span>
                     </TableCell>
-                    <TableCell className="text-right">{product.Efficiency_Score.toFixed(3)}</TableCell>
+                    <TableCell className="text-right">{product.Efficiency_Score.toFixed(2)}</TableCell>
                     <TableCell className="text-right">
-                      {product.New_Budget_Allocation > 0 ? `₹${(product.New_Budget_Allocation)}` : '-'}
+                      {product.New_Budget_Allocation > 0 ? `₹${(product.New_Budget_Allocation?.toFixed(2))}` : '-'}
                     </TableCell>
                     <TableCell className="text-right">
                       {product.Budget_Multiplier > 1 ? `${product.Budget_Multiplier}x` : '-'}
@@ -297,7 +303,7 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ results, total
               </TableBody>
             </Table>
           </div>
-          
+
           {results.length > 20 && (
             <p className="text-sm text-gray-500 mt-4 text-center">
               Showing top 20 products of {results.length} total products analyzed

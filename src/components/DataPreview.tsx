@@ -4,21 +4,27 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Eye, TrendingUp, TrendingDown } from 'lucide-react';
-import { BudgetDataZeptoReturn } from '@/pages/Index';
+import { BudgetDataBlinkitReturn, BudgetDataZeptoReturn } from '@/pages/Index';
+import { usePlatformStore } from '@/utils/zusStore';
+
 
 interface DataPreviewProps {
-  data: BudgetDataZeptoReturn[];
+  data: BudgetDataZeptoReturn[] | BudgetDataBlinkitReturn[];
 }
 
 export const DataPreview: React.FC<DataPreviewProps> = ({ data }) => {
+  console.log(data, "DataPreview component rendered with data:");
+  
   const previewData = data.slice(0, 5); // Show first 5 rows
+  const platform = usePlatformStore((state) => state.platform);
+
 
   const stats = {
     totalProducts: data.length,
-    totalSalesP2: data.reduce((sum, p) => sum + p['Total Sales in - Period 2'], 0),
+    totalSalesP2: data.reduce((sum, p) => sum + p['Total Sales - Period 2'], 0),
     totalSpendP2: data.reduce((sum, p) => sum + p['Total Spend - Period 2'], 0),
-    positiveTrend: data.filter(p => 
-      p['Total Sales in - Period 2'] > p['Total Sales in - Period 1']
+    positiveTrend: data.filter(p =>
+      p['Total Sales - Period 2'] > p['Total Sales - Period 1']
     ).length
   };
 
@@ -59,7 +65,7 @@ export const DataPreview: React.FC<DataPreviewProps> = ({ data }) => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Product</TableHead>
+                <TableHead>{`${platform === "Blinkit" ? 'Campaign' : 'Product'}`}</TableHead>
                 <TableHead className="text-right">Sales P1</TableHead>
                 <TableHead className="text-right">Sales P2</TableHead>
                 <TableHead className="text-right">Spend P2</TableHead>
@@ -69,21 +75,21 @@ export const DataPreview: React.FC<DataPreviewProps> = ({ data }) => {
             </TableHeader>
             <TableBody>
               {previewData.map((product, index) => {
-                const salesChange = product['Total Sales in - Period 2'] - product['Total Sales in - Period 1'];
+                const salesChange = product['Total Sales - Period 2'] - product['Total Sales - Period 1'];
                 const isGrowing = salesChange > 0;
-                
+
                 return (
                   <TableRow key={index}>
                     <TableCell>
                       <div>
-                        <div className="font-medium">{product['ProductName']}</div>
-                        <div className="text-sm text-gray-500">{product['ProductID']}</div>
+                        <div className="font-medium">{product['ProductName'] || product['Campaign Name']}</div>
+                        <div className="text-sm text-gray-500">{product['ProductID'] || product['Targeting Value']}</div>
                       </div>
                     </TableCell>
-                    <TableCell className="text-right">₹{(product['Total Sales in - Period 1'])}</TableCell>
-                    <TableCell className="text-right">₹{(product['Total Sales in - Period 2'])}</TableCell>
+                    <TableCell className="text-right">₹{(product['Total Sales - Period 1'])}</TableCell>
+                    <TableCell className="text-right">₹{(product['Total Sales - Period 2'])}</TableCell>
                     <TableCell className="text-right">₹{(product['Total Spend - Period 2'])}</TableCell>
-                    <TableCell className="text-right">{product['ROI - Period 2']}x</TableCell>
+                    <TableCell className="text-right">{product['ROI - Period 2'].toFixed(0)}x</TableCell>
                     <TableCell>
                       <Badge variant={isGrowing ? "default" : "secondary"} className="flex items-center gap-1 w-fit">
                         {isGrowing ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}

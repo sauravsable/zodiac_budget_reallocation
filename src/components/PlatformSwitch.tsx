@@ -1,13 +1,17 @@
+import { usePlatformStore } from "@/utils/zusStore";
 import React, { useState } from "react";
 
 const PlatformSwitch = () => {
-  const [selected, setSelected] = useState("Zepto");
+  const [selected, setSelected] = useState("Blinkit");
+  const setPlatform = usePlatformStore((state) => state.platform = selected);
+  const platform = usePlatformStore((state) => state.platform);
+
 
   const platforms = [
     {
       label: "Blinkit",
       bgClass: "bg-yellow-600",
-      disabled: true,
+      disabled: false,
     },
     {
       label: "Zepto",
@@ -20,6 +24,8 @@ const PlatformSwitch = () => {
       disabled: true,
     },
   ];
+  console.log(platform, "platforms");
+
 
   return (
     <div className="w-full flex justify-center">
@@ -35,15 +41,19 @@ const PlatformSwitch = () => {
                 key={label}
                 role="button"
                 tabIndex={0}
-                onClick={() => !disabled && setSelected(label)}
+                onClick={() => {
+                  if (!disabled) {
+                    setPlatform
+                    setSelected(label);
+                  }
+                }}
                 onKeyPress={(e) => e.key === "Enter" && setSelected(label)}
                 className={`px-4 py-1.5 text-sm font-medium border transition-all duration-200 rounded-md
-  ${
-    isSelected
-      ? `${bgClass} text-white border-transparent`
-      : "bg-slate-800 text-white border border-white/20 hover:border-white/40 hover:bg-slate-700"
-  } ${!disabled ? "cursor-pointer" : "cursor-not-allowed"}
-`}
+                    ${isSelected
+                    ? `${bgClass} text-white border-transparent`
+                    : "bg-slate-800 text-white border border-white/20 hover:border-white/40 hover:bg-slate-700"
+                  } ${!disabled ? "cursor-pointer" : "cursor-not-allowed"}
+                    `}
               >
                 {label}
               </div>

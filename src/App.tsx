@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import BudgetAllocation from "./pages/BudgetAllocation";
 import NotFound from "./pages/NotFound";
 import WhitespaceAnalysis from "./pages/WhitespaceAnalysis";
+import Sidebar from "@/components/Sidebar";
 
 const queryClient = new QueryClient();
 
@@ -23,11 +24,16 @@ const App = () => {
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<BudgetAllocation />} />
-            <Route path="/whitespace-analysis" element={<WhitespaceAnalysis />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <div className="flex flex-row">
+            <Sidebar />
+            <div className="w-[calc(100vw-16rem)]  overflow-y-scroll">
+              <Routes>
+                <Route path="/" element={<BudgetAllocation />} />
+                <Route path="/whitespace-analysis" element={<WhitespaceAnalysis />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </div>
+          </div>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>

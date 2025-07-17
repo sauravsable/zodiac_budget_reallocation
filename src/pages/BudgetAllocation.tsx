@@ -23,7 +23,6 @@ import { AnalysisResults } from "@/components/AnalysisResults";
 import { DataPreview } from "@/components/DataPreview";
 import { ExecutiveSummary } from "@/components/ExecutiveSummary";
 import { processCSVData, mergeBudgetData, mergeBudgetDataBlinkit, processCSVDataBlinkit } from "@/utils/budgetAnalysis";
-import Sidebar from "@/components/Sidebar";
 import PlatformSwitch from "@/components/PlatformSwitch";
 import { usePlatformStore } from "@/utils/zusStore";
 
@@ -219,9 +218,9 @@ const BudgetAllocation = () => {
   console.log("csvdata2", csvData2, csvData);
 
   return (
-    <div className="min-h-screen bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 text-gray-700 flex">
-      <Sidebar />
-      <div className="h-screen w-[calc(100vw-16rem)] overflow-y-scroll">
+    <div className="min-h-screen w-full bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 text-gray-700 flex">
+     
+      <div className="h-screen">
         {/* Header */}
         <div className=" border-b border-border">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">

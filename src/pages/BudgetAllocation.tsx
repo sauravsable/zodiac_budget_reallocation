@@ -25,6 +25,7 @@ import { ExecutiveSummary } from "@/components/ExecutiveSummary";
 import { processCSVData, mergeBudgetData, mergeBudgetDataBlinkit, processCSVDataBlinkit } from "@/utils/budgetAnalysis";
 import PlatformSwitch from "@/components/PlatformSwitch";
 import { usePlatformStore } from "@/utils/zusStore";
+import Quadrant from "@/components/Quadrant";
 
 export interface BudgetDataZepto {
   ProductID: string;

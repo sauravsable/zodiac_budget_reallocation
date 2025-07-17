@@ -8,6 +8,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { TrendingUp, Award, Currency, Target, Crown } from 'lucide-react';
 import { AnalysisResult } from '@/pages/BudgetAllocation';
 import { usePlatformStore } from '@/utils/zusStore';
+import Quadrant from './Quadrant';
 
 interface AnalysisResultsProps {
   results: AnalysisResult[];
@@ -169,7 +170,7 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ results, total
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  label={({ name, percent }) => `${name} ${(percent).toFixed(1)*100}%`}
+                  label={({ name, percent }) => `${name} ${(percent).toFixed(1) * 100}%`}
                   outerRadius={80}
                   fill="#8884d8"
                   dataKey="value"
@@ -188,43 +189,27 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ results, total
       {/* Efficiency vs Performance Scatter */}
       <Card>
         <CardHeader>
-          <CardTitle>Efficiency vs Performance Analysis</CardTitle>
+          <CardTitle>Efficiency vs Growth</CardTitle>
           <CardDescription>
             Products positioned by efficiency score and incremental ROI performance
           </CardDescription>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={400}>
-            <ScatterChart data={efficiencyChart}>
-              <CartesianGrid />
-              <XAxis
-                type="number"
-                dataKey="efficiency"
-                name="Efficiency Score"
-                domain={[0, 'dataMax']}
-              />
-              <YAxis
-                type="number"
-                dataKey="incremental"
-                name="Incremental ROI Score"
-                domain={[0, 'dataMax']}
-              />
-              <Tooltip
-                cursor={{ strokeDasharray: '3 3' }}
-                formatter={(value) => [typeof value === 'number' ? value.toFixed(2) : value]}
-                labelFormatter={(label, payload) => {
-                  if (payload && payload.length > 0) {
-                    return `${platform === 'Blinkit' ? 'Campaign' : 'Product'}: ${payload[0]?.payload?.name}`;
-                  }
-                  return '';
-                }}
-              />
-              <Scatter
-                dataKey="allocation"
-                fill="#8884d8"
-                name="Budget Allocation (₹K)"
-              />
-            </ScatterChart>
+            <Quadrant rawData={efficiencyChart} />
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>Efficiency vs Budget Analysis</CardTitle>
+          <CardDescription>
+            Products positioned by efficiency score and incremental ROI performance
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ResponsiveContainer width="100%" height={400}>
+            <Quadrant rawData={efficiencyChart} />
           </ResponsiveContainer>
         </CardContent>
       </Card>

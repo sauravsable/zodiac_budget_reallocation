@@ -13,11 +13,6 @@ import Sidebar from "@/components/Sidebar";
 const queryClient = new QueryClient();
 
 const App = () => {
-  useEffect(() => {
-    // Apply dark theme to the document
-    document.documentElement.classList.add('dark');
-  }, []);
-
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>

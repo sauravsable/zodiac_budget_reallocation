@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { TrendingUp, Currency, Target, Zap, Trophy, AlertTriangle, CheckCircle } from 'lucide-react';
-import { AnalysisResult } from '@/pages/Index';
+import { AnalysisResult } from '@/pages/BudgetAllocation';
 
 interface ExecutiveSummaryProps {
   results: AnalysisResult[];

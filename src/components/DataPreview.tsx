@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Eye, TrendingUp, TrendingDown } from 'lucide-react';
-import { BudgetDataBlinkitReturn, BudgetDataZeptoReturn } from '@/pages/Index';
+import { BudgetDataBlinkitReturn, BudgetDataZeptoReturn } from '@/pages/BudgetAllocation';
 import { usePlatformStore } from '@/utils/zusStore';
 
 

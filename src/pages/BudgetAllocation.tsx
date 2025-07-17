@@ -101,7 +101,7 @@ export interface AnalysisResultBlinkit extends BudgetDataBlinkitReturn {
 type BudgetData = BudgetDataZepto | BudgetDataBlinkit;
 type AnalysisResult = AnalysisResultZepto | AnalysisResultBlinkit;
 
-const Index = () => {
+const BudgetAllocation = () => {
   const [csvData, setCsvData] = useState<BudgetData[]>([]);
   const [csvData2, setCsvData2] = useState<BudgetData[]>([]);
   // const [isFirstFileUploaded, setIsFirstFileUploaded] = useState(false);
@@ -589,10 +589,15 @@ const Index = () => {
                     <div className="space-y-6">
                       <div className="flex justify-between items-center">
                         <h2 className="text-2xl font-bold">Analysis Results</h2>
-                        <Button onClick={exportResults} variant="outline">
-                          <Download className="h-4 w-4 mr-2" />
-                          Export CSV
-                        </Button>
+                        <div className="flex items-center space-x-4">
+                          <Button onClick={exportResults} variant="outline">
+                            <Download className="h-4 w-4 mr-2" />
+                            Export CSV
+                          </Button>
+                          <div className="text-md font-semibold rounded-md px-3 py-2 bg-blue-100 text-blue-500">
+                            Platform: {platform}
+                          </div>
+                        </div>
                       </div>
                       <AnalysisResults results={analysisResults} totalBudget={parseFloat(totalBudget)} />
                     </div>
@@ -658,4 +663,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default BudgetAllocation;

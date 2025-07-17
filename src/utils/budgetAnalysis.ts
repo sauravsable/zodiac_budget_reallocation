@@ -1,5 +1,5 @@
 
-import { BudgetDataZepto, BudgetDataZeptoReturn, AnalysisResultZepto, BudgetDataBlinkit, BudgetDataBlinkitReturn, AnalysisResultBlinkit } from '@/pages/Index';
+import { BudgetDataZepto, BudgetDataZeptoReturn, AnalysisResultZepto, BudgetDataBlinkit, BudgetDataBlinkitReturn, AnalysisResultBlinkit } from '@/pages/BudgetAllocation';
 
 export function mergeBudgetData(
   data1: BudgetDataZepto[],

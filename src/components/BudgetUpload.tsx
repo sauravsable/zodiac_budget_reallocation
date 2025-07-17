@@ -5,7 +5,7 @@ import { Upload, FileText, AlertCircle } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { BudgetDataZepto } from "@/pages/Index";
+import { BudgetDataZepto } from "@/pages/BudgetAllocation";
 
 interface BudgetUploadProps {
   onDataUpload: (data: BudgetDataZepto[]) => void;

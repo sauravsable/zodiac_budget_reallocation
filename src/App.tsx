@@ -5,8 +5,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useEffect } from "react";
-import Index from "./pages/Index";
+import BudgetAllocation from "./pages/BudgetAllocation";
 import NotFound from "./pages/NotFound";
+import WhitespaceAnalysis from "./pages/WhitespaceAnalysis";
 
 const queryClient = new QueryClient();
 
@@ -23,8 +24,8 @@ const App = () => {
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Index />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="/budget-allocation" element={<BudgetAllocation />} />
+            <Route path="/whitespace-analysis" element={<WhitespaceAnalysis />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

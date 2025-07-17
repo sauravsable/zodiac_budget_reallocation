@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ScatterChart, Scatter, PieChart, Pie, Cell } from 'recharts';
 import { TrendingUp, Award, Currency, Target, Crown } from 'lucide-react';
-import { AnalysisResult } from '@/pages/Index';
+import { AnalysisResult } from '@/pages/BudgetAllocation';
 import { usePlatformStore } from '@/utils/zusStore';
 
 interface AnalysisResultsProps {
@@ -169,7 +169,7 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ results, total
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  label={({ name, percent }) => `${name} ${(percent).toFixed(1)}%`}
+                  label={({ name, percent }) => `${name} ${(percent).toFixed(1)*100}%`}
                   outerRadius={80}
                   fill="#8884d8"
                   dataKey="value"

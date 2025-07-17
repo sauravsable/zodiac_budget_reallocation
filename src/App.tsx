@@ -24,7 +24,7 @@ const App = () => {
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/budget-allocation" element={<BudgetAllocation />} />
+            <Route path="/" element={<BudgetAllocation />} />
             <Route path="/whitespace-analysis" element={<WhitespaceAnalysis />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

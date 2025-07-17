@@ -32,13 +32,11 @@ const SidebarItem = ({ icon, label }) => {
   const getPathFromLabel = (label) => {
     switch (label) {
       case "Budget Allocation":
-        return "/budget-allocation";
+        return "/";
       case "Whitespace Analysis":
         return "/whitespace-analysis";
       case "Logout":
         return "/logout";
-      default:
-        return "/";
     }
   };
 

@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -21,7 +20,7 @@ const App = () => {
         <BrowserRouter>
           <div className="flex flex-row">
             <Sidebar />
-            <div className="w-[calc(100vw-16rem)]  overflow-y-scroll">
+            <div className="w-[calc(100vw-16rem)] overflow-y-scroll bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50">
               <Routes>
                 <Route path="/" element={<BudgetAllocation />} />
                 <Route path="/whitespace-analysis" element={<WhitespaceAnalysis />} />

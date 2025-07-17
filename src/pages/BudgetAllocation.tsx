@@ -45,26 +45,26 @@ export interface BudgetDataBlinkit {
 }
 
 export interface BudgetDataZeptoReturn {
-  'ProductID': string,
-  'ProductName': string,
-  'Campaign_id': string,
-  'Total Sales - Period 1': number,
-  'Total Spend - Period 1': number,
-  'ROI - Period 1': number,
-  'Total Sales - Period 2': number,
-  'Total Spend - Period 2': number,
-  'ROI - Period 2': number,
+  ProductID: string;
+  ProductName: string;
+  Campaign_id: string;
+  "Total Sales - Period 1": number;
+  "Total Spend - Period 1": number;
+  "ROI - Period 1": number;
+  "Total Sales - Period 2": number;
+  "Total Spend - Period 2": number;
+  "ROI - Period 2": number;
 }
 export interface BudgetDataBlinkitReturn {
-  "Campaign Name": string,
-  "Targeting Value": string,
-  "Targeting Type": string,
-  'Total Sales - Period 1': number,
-  'Total Spend - Period 1': number,
-  'ROI - Period 1': number,
-  'Total Sales - Period 2': number,
-  'Total Spend - Period 2': number,
-  'ROI - Period 2': number,
+  "Campaign Name": string;
+  "Targeting Value": string;
+  "Targeting Type": string;
+  "Total Sales - Period 1": number;
+  "Total Spend - Period 1": number;
+  "ROI - Period 1": number;
+  "Total Sales - Period 2": number;
+  "Total Spend - Period 2": number;
+  "ROI - Period 2": number;
 }
 
 export interface AnalysisResultZepto extends BudgetDataZeptoReturn {
@@ -112,7 +112,6 @@ const BudgetAllocation = () => {
   const [error, setError] = useState<string>("");
   const [activeTab, setActiveTab] = useState("upload");
   const platform = usePlatformStore((state) => state.platform);
-
 
   const handleDataUpload = useCallback((data: BudgetDataZepto[]) => {
     setCsvData(data);
@@ -163,13 +162,11 @@ const BudgetAllocation = () => {
         console.log("mergedresult", mergedresult);
         results = processCSVDataBlinkit(mergedresult, budget);
         console.log("results Blinkit", results);
-
       }
       if (platform === "Zepto") {
         mergedresult = mergeBudgetData(csvData, csvData2);
         results = processCSVData(mergedresult, budget);
       }
-
 
       console.log("results", results);
 
@@ -207,19 +204,18 @@ const BudgetAllocation = () => {
   const stats =
     analysisResults.length > 0
       ? {
-        totalProducts: analysisResults.length,
-        fundedProducts: analysisResults.filter((p) => p.New_Budget_Allocation > 0).length,
-        efficiencyWinners: analysisResults.filter((p) => p.isEfficiencyWinner).length,
-        totalAllocated: analysisResults.reduce((sum, p) => sum + p.New_Budget_Allocation, 0),
-        expectedIncrease: analysisResults.reduce((sum, p) => sum + p.Projected_Sales_Increase, 0),
-      }
+          totalProducts: analysisResults.length,
+          fundedProducts: analysisResults.filter((p) => p.New_Budget_Allocation > 0).length,
+          efficiencyWinners: analysisResults.filter((p) => p.isEfficiencyWinner).length,
+          totalAllocated: analysisResults.reduce((sum, p) => sum + p.New_Budget_Allocation, 0),
+          expectedIncrease: analysisResults.reduce((sum, p) => sum + p.Projected_Sales_Increase, 0),
+        }
       : null;
 
   console.log("csvdata2", csvData2, csvData);
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 text-gray-700 flex">
-     
+    <div className="min-h-screen w-full text-gray-700 flex">
       <div className="h-screen">
         {/* Header */}
         <div className=" border-b border-border">
@@ -437,13 +433,17 @@ const BudgetAllocation = () => {
                             <div>
                               <span className="text-gray-500">Current Total Sales:</span>
                               <span className="ml-2 font-medium">
-                                ₹{csvData.reduce((sum, p) => {
-                                  const revenue = p["Revenue"];
-                                  const value = revenue !== undefined && revenue !== null
-                                    ? Number(revenue)
-                                    : Number(p["Direct Sales"] || 0) + Number(p["Indirect Sales"] || 0);
-                                  return sum + value;
-                                }, 0).toFixed(0)}
+                                ₹
+                                {csvData
+                                  .reduce((sum, p) => {
+                                    const revenue = p["Revenue"];
+                                    const value =
+                                      revenue !== undefined && revenue !== null
+                                        ? Number(revenue)
+                                        : Number(p["Direct Sales"] || 0) + Number(p["Indirect Sales"] || 0);
+                                    return sum + value;
+                                  }, 0)
+                                  .toFixed(0)}
                               </span>
                             </div>
                           </div>
@@ -615,7 +615,13 @@ const BudgetAllocation = () => {
               {csvData.length > 0 && (
                 <div className="flex justify-center mt-5">
                   <div className="w-full max-w-6xl">
-                    <DataPreview data={platform === "Blinkit" ? mergeBudgetDataBlinkit(csvData, csvData2) : mergeBudgetData(csvData, csvData2)} />
+                    <DataPreview
+                      data={
+                        platform === "Blinkit"
+                          ? mergeBudgetDataBlinkit(csvData, csvData2)
+                          : mergeBudgetData(csvData, csvData2)
+                      }
+                    />
                   </div>
                 </div>
               )}

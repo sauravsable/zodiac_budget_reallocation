@@ -1,31 +1,29 @@
 
 import { BudgetDataZepto, BudgetDataZeptoReturn, AnalysisResultZepto, BudgetDataBlinkit, BudgetDataBlinkitReturn, AnalysisResultBlinkit } from '@/pages/BudgetAllocation';
 
-export function mergeBudgetData(
+export function mergeBudgetDataZepto(
   data1: BudgetDataZepto[],
   data2: BudgetDataZepto[]
 ): BudgetDataZeptoReturn[] {
   const map1 = new Map<string, BudgetDataZepto>();
 
   data1.forEach(item => {
-    const key = `${item.ProductID}|${item.Campaign_id}`;
+    const key = `${item.CampaignName}`;
     map1.set(key, item);
   });
 
   return data2.map(item2 => {
-    const key = `${item2.ProductID}|${item2.Campaign_id}`;
+    const key = `${item2.CampaignName}`;
     const item1 = map1.get(key) ?? {};
 
     return {
-      'ProductID': item2['ProductID'],
-      'ProductName': item2['ProductName'],
-      'Campaign_id': item2['Campaign_id'],
+      'Campaign Name': item2['CampaignName'],
       'Total Sales - Period 1': Number(item1['Revenue'] ?? 0),
       'Total Spend - Period 1': Number(item1['Spend'] ?? 0),
       'ROI - Period 1': Number(item1['Roas'] ?? 0),
       'Total Sales - Period 2': Number(item2['Revenue'] ?? 0),
-      'Total Spend - Period 2': Number(item2['Spend']),
-      'ROI - Period 2': Number(item2['Roas']),
+      'Total Spend - Period 2': Number(item2['Spend'] ?? 0),
+      'ROI - Period 2': Number(item2['Roas'] ?? 0),
     };
   });
 }
@@ -59,11 +57,6 @@ export function mergeBudgetDataBlinkit(
 }
 
 export function processCSVData(data: BudgetDataZeptoReturn[], totalBudgetLakhs: number): AnalysisResultZepto[] {
-
-  console.log("data in processCSV Data", data);
-
-  console.log(`Processing ${data.length} products with ₹${totalBudgetLakhs} Lakhs budget`);
-
   // Calculate incremental metrics
   const processedData = data.map(product => {
     const incrementalSales = product['Total Sales - Period 2'] - product['Total Sales - Period 1'];
@@ -181,10 +174,6 @@ export function processCSVData(data: BudgetDataZeptoReturn[], totalBudgetLakhs: 
 }
 export function processCSVDataBlinkit(data: BudgetDataBlinkitReturn[], totalBudgetLakhs: number): AnalysisResultBlinkit[] {
 
-  console.log("data in processCSV Data", data);
-
-  console.log(`Processing ${data.length} products with ₹${totalBudgetLakhs} Lakhs budget`);
-
   // Calculate incremental metrics
   const processedData = data.map(product => {
     const incrementalSales = product['Total Sales - Period 2'] - product['Total Sales - Period 1'];
@@ -295,8 +284,6 @@ export function processCSVDataBlinkit(data: BudgetDataBlinkitReturn[], totalBudg
       Projected_ROI: Number(projectedROI.toFixed(2))
     } as AnalysisResultBlinkit;
   });
-
-  console.log(`Budget allocation complete. Remaining: ₹${remainingBudget.toFixed(2)} Lakhs`);
 
   return results;
 }

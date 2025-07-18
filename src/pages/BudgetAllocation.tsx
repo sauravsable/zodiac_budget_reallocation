@@ -1,12 +1,10 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback } from "react";
 import {
-  Upload,
   Calculator,
   BarChart3,
   Download,
   AlertCircle,
   CheckCircle,
-  TrendingUp,
   Currency,
   Target,
   Zap,
@@ -16,26 +14,33 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { BudgetUpload } from "@/components/BudgetUpload";
 import { AnalysisResults } from "@/components/AnalysisResults";
 import { DataPreview } from "@/components/DataPreview";
 import { ExecutiveSummary } from "@/components/ExecutiveSummary";
-import { processCSVData, mergeBudgetData, mergeBudgetDataBlinkit, processCSVDataBlinkit } from "@/utils/budgetAnalysis";
+import { processCSVData, mergeBudgetDataZepto, mergeBudgetDataBlinkit, processCSVDataBlinkit } from "@/utils/budgetAnalysis";
 import PlatformSwitch from "@/components/PlatformSwitch";
 import { usePlatformStore } from "@/utils/zusStore";
-import Quadrant from "@/components/Quadrant";
 
 export interface BudgetDataZepto {
-  ProductID: string;
-  Campaign_id: string;
-  "Product Name": string;
+  CampaignName: string;
   Revenue: number;
   Spend: number;
   Roas: number;
 }
-export interface BudgetDataBlinkit {
+
+export type BudgetDataZeptoReturn = {
+  'Campaign Name': string,
+  'Total Sales - Period 1': number,
+  'Total Spend - Period 1': number,
+  'ROI - Period 1': number,
+  'Total Sales - Period 2': number,
+  'Total Spend - Period 2': number,
+  'ROI - Period 2': number,
+}
+export type BudgetDataBlinkit = {
   "Campaign Name": string;
   "Targeting Value": string;
   "Targeting Type": string;
@@ -45,18 +50,7 @@ export interface BudgetDataBlinkit {
   "Total RoAS": number;
 }
 
-export interface BudgetDataZeptoReturn {
-  'ProductID': string,
-  'ProductName': string,
-  'Campaign_id': string,
-  'Total Sales - Period 1': number,
-  'Total Spend - Period 1': number,
-  'ROI - Period 1': number,
-  'Total Sales - Period 2': number,
-  'Total Spend - Period 2': number,
-  'ROI - Period 2': number,
-}
-export interface BudgetDataBlinkitReturn {
+export type BudgetDataBlinkitReturn = {
   "Campaign Name": string,
   "Targeting Value": string,
   "Targeting Type": string,
@@ -68,7 +62,7 @@ export interface BudgetDataBlinkitReturn {
   'ROI - Period 2': number,
 }
 
-export interface AnalysisResultZepto extends BudgetDataZeptoReturn {
+type AnalysisResultBase = {
   Incremental_Sales: number;
   Incremental_Spend: number;
   Original_Incremental_ROI: number;
@@ -82,29 +76,17 @@ export interface AnalysisResultZepto extends BudgetDataZeptoReturn {
   Projected_New_Sales: number;
   Projected_ROI: number;
   isEfficiencyWinner: boolean;
-}
-export interface AnalysisResultBlinkit extends BudgetDataBlinkitReturn {
-  Incremental_Sales: number;
-  Incremental_Spend: number;
-  Original_Incremental_ROI: number;
-  Incremental_ROI_Score: number;
-  Current_ROI: number;
-  Efficiency_Score: number;
-  Ranking_Score: number;
-  New_Budget_Allocation: number;
-  Budget_Multiplier: number;
-  Projected_Sales_Increase: number;
-  Projected_New_Sales: number;
-  Projected_ROI: number;
-  isEfficiencyWinner: boolean;
-}
-type BudgetData = BudgetDataZepto | BudgetDataBlinkit;
-type AnalysisResult = AnalysisResultZepto | AnalysisResultBlinkit;
+};
+
+export type AnalysisResultZepto = BudgetDataZeptoReturn & AnalysisResultBase;
+
+export type AnalysisResultBlinkit = BudgetDataBlinkitReturn & AnalysisResultBase;
+
+export type AnalysisResult = AnalysisResultZepto | AnalysisResultBlinkit;
 
 const BudgetAllocation = () => {
-  const [csvData, setCsvData] = useState<BudgetData[]>([]);
-  const [csvData2, setCsvData2] = useState<BudgetData[]>([]);
-  // const [isFirstFileUploaded, setIsFirstFileUploaded] = useState(false);
+  const [csvData, setCsvData] = useState([]);
+  const [csvData2, setCsvData2] = useState([]);
   const [isUpload, setisUpload] = useState(false);
   const [totalBudget, setTotalBudget] = useState<string>("");
   const [analysisResults, setAnalysisResults] = useState<AnalysisResult[]>([]);
@@ -123,7 +105,6 @@ const BudgetAllocation = () => {
   const handleDataUpload2 = useCallback((data: BudgetDataZepto[]) => {
     setCsvData2(data);
     setisUpload(true);
-
     setError("");
   }, []);
 
@@ -161,19 +142,12 @@ const BudgetAllocation = () => {
       let results;
       if (platform === "Blinkit") {
         mergedresult = mergeBudgetDataBlinkit(csvData, csvData2);
-        console.log("mergedresult", mergedresult);
         results = processCSVDataBlinkit(mergedresult, budget);
-        console.log("results Blinkit", results);
-
       }
       if (platform === "Zepto") {
-        mergedresult = mergeBudgetData(csvData, csvData2);
+        mergedresult = mergeBudgetDataZepto(csvData, csvData2);
         results = processCSVData(mergedresult, budget);
       }
-
-
-      console.log("results", results);
-
       setAnalysisResults(results);
       setActiveTab("results");
     } catch (err) {
@@ -216,8 +190,6 @@ const BudgetAllocation = () => {
       }
       : null;
 
-  console.log("csvdata2", csvData2, csvData);
-
   return (
     <div className="min-h-screen w-full bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 text-gray-700 flex">
      
@@ -232,23 +204,6 @@ const BudgetAllocation = () => {
                   Comprehensive Budget Allocation Analysis with Optimized Efficiency Gains
                 </p>
               </div>
-
-              {/* {stats && (
-                <div className="hidden md:flex items-center gap-6 text-sm">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-blue-400">{stats.fundedProducts}</div>
-                    <div className="text-muted-foreground">Products Funded</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-green-400">{stats.efficiencyWinners}</div>
-                    <div className="text-muted-foreground">Efficiency Winners</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-purple-400">₹{stats.totalAllocated.toFixed(0)}</div>
-                    <div className="text-muted-foreground">Total Allocated</div>
-                  </div>
-                </div>
-              )} */}
             </div>
           </div>
         </div>
@@ -265,25 +220,6 @@ const BudgetAllocation = () => {
             {activeTab === "upload" && (
               <div className="flex justify-center mb-6">
                 <PlatformSwitch />
-
-                {/* <TabsList className="grid w-full grid-cols-4 lg:w-1/2">
-                <TabsTrigger value="upload" className="flex items-center gap-2">
-                  <Upload className="h-4 w-4" />
-                  Blinkit
-                </TabsTrigger>
-                <TabsTrigger value="configure" className="flex items-center gap-2">
-                  <Calculator className="h-4 w-4" />
-                  Zepto
-                </TabsTrigger>
-                <TabsTrigger value="results" className="flex items-center gap-2">
-                  <BarChart3 className="h-4 w-4" />
-                  Instamart
-                </TabsTrigger>
-                <TabsTrigger value="summary" className="flex items-center gap-2">
-                  <Target className="h-4 w-4" />
-                  Summary
-                </TabsTrigger>
-              </TabsList> */}
               </div>
             )}
 
@@ -475,113 +411,6 @@ const BudgetAllocation = () => {
               )}
             </TabsContent>
 
-            {/* <TabsContent value="configure" className="mt-6">
-              <div className="flex justify-center">
-                <div className="w-full max-w-4xl">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                          <Currency className="h-5 w-5 text-green-400" />
-                          Budget Configuration
-                        </CardTitle>
-                        <CardDescription>Set your total budget for reallocation analysis</CardDescription>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div>
-                          <Label htmlFor="budget">Total Budget (in Lakhs)</Label>
-                          <Input
-                            id="budget"
-                            type="number"
-                            placeholder="e.g., 10.5"
-                            value={totalBudget}
-                            onChange={(e) => setTotalBudget(e.target.value)}
-                            className="mt-1"
-                          />
-                          <p className="text-sm text-muted-foreground mt-1">
-                            Enter the total budget available for allocation (₹
-                            {totalBudget ? (parseFloat(totalBudget) * 100).toFixed(0) : "0"}K)
-                          </p>
-                        </div>
-
-                        {csvData.length > 0 && (
-                          <div className="bg-muted p-4 rounded-lg">
-                            <h4 className="font-medium mb-2">Data Summary</h4>
-                            <div className="grid grid-cols-2 gap-4 text-sm">
-                              <div>
-                                <span className="text-muted-foreground">Products:</span>
-                                <span className="ml-2 font-medium">{csvData.length}</span>
-                              </div>
-                              <div>
-                                <span className="text-muted-foreground">Current Total Sales:</span>
-                                <span className="ml-2 font-medium">
-                                  ₹{csvData.reduce((sum, p) => sum + Number(p["Revenue"]), 0).toFixed(0)}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-
-                        <Button
-                          onClick={runAnalysis}
-                          disabled={!csvData.length || !totalBudget || isAnalyzing}
-                          className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-                          size="lg"
-                        >
-                          {isAnalyzing ? "Analyzing..." : "Run Budget Analysis"}
-                          <Calculator className="ml-2 h-4 w-4" />
-                        </Button>
-
-                        {isAnalyzing && (
-                          <div className="space-y-2">
-                            <Progress value={progress} className="w-full" />
-                            <p className="text-sm text-muted-foreground text-center">
-                              Processing budget allocation algorithm...
-                            </p>
-                          </div>
-                        )}
-                      </CardContent>
-                    </Card>
-
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>Analysis Methodology</CardTitle>
-                        <CardDescription>How the advanced algorithm works</CardDescription>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div className="space-y-3">
-                          <div className="border-l-4 border-blue-500 pl-3">
-                            <h4 className="font-medium">1. Efficiency Scoring</h4>
-                            <p className="text-sm text-muted-foreground">
-                              Products with increased sales and reduced spend get bonus points
-                            </p>
-                          </div>
-                          <div className="border-l-4 border-green-500 pl-3">
-                            <h4 className="font-medium">2. Weighted Ranking</h4>
-                            <p className="text-sm text-muted-foreground">
-                              30% efficiency + 70% incremental performance
-                            </p>
-                          </div>
-                          <div className="border-l-4 border-purple-500 pl-3">
-                            <h4 className="font-medium">3. Smart Allocation</h4>
-                            <p className="text-sm text-muted-foreground">
-                              Up to 3x budget for efficiency winners, 2.5x for top performers
-                            </p>
-                          </div>
-                          <div className="border-l-4 border-orange-500 pl-3">
-                            <h4 className="font-medium">4. ROI Projection</h4>
-                            <p className="text-sm text-muted-foreground">
-                              Forecasts sales increases based on allocation multipliers
-                            </p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-                </div>
-              </div>
-            </TabsContent> */}
-
             <TabsContent value="results" className="mt-6">
               <div className="flex justify-center">
                 <div className="w-full max-w-6xl">
@@ -616,7 +445,7 @@ const BudgetAllocation = () => {
               {csvData.length > 0 && (
                 <div className="flex justify-center mt-5">
                   <div className="w-full max-w-6xl">
-                    <DataPreview data={platform === "Blinkit" ? mergeBudgetDataBlinkit(csvData, csvData2) : mergeBudgetData(csvData, csvData2)} />
+                    <DataPreview data={platform === "Blinkit" ? mergeBudgetDataBlinkit(csvData, csvData2) : mergeBudgetDataZepto(csvData, csvData2)} />
                   </div>
                 </div>
               )}
@@ -637,25 +466,6 @@ const BudgetAllocation = () => {
                 </div>
               </div>
             </TabsContent>
-
-            {/* <TabsContent value="summary" className="mt-6">
-              <div className="flex justify-center">
-                <div className="w-full max-w-6xl">
-                  {analysisResults.length > 0 ? (
-                    <ExecutiveSummary results={analysisResults} totalBudget={parseFloat(totalBudget)} />
-                  ) : (
-                    <Card>
-                      <CardContent className="py-12 text-center">
-                        <Target className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                        <p className="text-muted-foreground">
-                          Executive summary will appear here after running the analysis.
-                        </p>
-                      </CardContent>
-                    </Card>
-                  )}
-                </div>
-              </div>
-            </TabsContent> */}
           </Tabs>
         </div>
       </div>

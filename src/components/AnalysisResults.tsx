@@ -8,6 +8,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { TrendingUp, Award, Currency, Target, Crown } from 'lucide-react';
 import { AnalysisResult } from '@/pages/BudgetAllocation';
 import { usePlatformStore } from '@/utils/zusStore';
+import Quadrant from './Quadrant';
 
 interface AnalysisResultsProps {
   results: AnalysisResult[];
@@ -15,6 +16,8 @@ interface AnalysisResultsProps {
 }
 
 export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ results, totalBudget }) => {
+  console.log(results, "analysis");
+
 
   const fundedProducts = results.filter(p => p.New_Budget_Allocation > 0);
   const efficiencyWinners = results.filter(p => p.isEfficiencyWinner);
@@ -28,9 +31,9 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ results, total
 
   // Chart data
   const topProductsChart = results.slice(0, 10).map(p => ({
-    name: (p['ProductName'] || p['Campaign Name'])?.length > 15
-      ? (p['ProductName'] || p['Campaign Name']).substring(0, 15) + '...'
-      : (p['ProductName'] || p['Campaign Name']),
+    name:  p['Campaign Name']?.length > 15
+      ? p['Campaign Name'].substring(0, 15) + '...'
+      : p['Campaign Name'],
     allocation: p.New_Budget_Allocation,
     multiplier: p.Budget_Multiplier,
     isEfficiency: p.isEfficiencyWinner
@@ -40,7 +43,7 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ results, total
     efficiency: p.Efficiency_Score,
     incremental: p.Incremental_ROI_Score,
     allocation: p.New_Budget_Allocation,
-    name: p['ProductName'] || p['Campaign Name'],
+    name: p['Campaign Name'],
   }));
 
   const budgetDistribution = [
@@ -58,7 +61,7 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ results, total
               <Target className="h-5 w-5 text-blue-500" />
               <div>
                 <div className="text-2xl font-bold text-blue-600">{fundedProducts.length}</div>
-                <div className="text-sm text-gray-600">Products Funded</div>
+                <div className="text-sm text-gray-600">Campaigns Funded</div>
               </div>
             </div>
           </CardContent>
@@ -124,7 +127,7 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ results, total
         <Card>
           <CardHeader>
             <CardTitle>Top 10 Budget Allocations</CardTitle>
-            <CardDescription>Products receiving the highest budget allocation</CardDescription>
+            <CardDescription>Campaigns receiving the highest budget allocation</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -169,7 +172,7 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ results, total
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  label={({ name, percent }) => `${name} ${(percent).toFixed(1)*100}%`}
+                  label={({ name, percent }) => `${name} ${(percent).toFixed(1) * 100}%`}
                   outerRadius={80}
                   fill="#8884d8"
                   dataKey="value"
@@ -188,43 +191,37 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ results, total
       {/* Efficiency vs Performance Scatter */}
       <Card>
         <CardHeader>
-          <CardTitle>Efficiency vs Performance Analysis</CardTitle>
+          <CardTitle>Efficiency vs Growth</CardTitle>
           <CardDescription>
             Products positioned by efficiency score and incremental ROI performance
           </CardDescription>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={400}>
-            <ScatterChart data={efficiencyChart}>
-              <CartesianGrid />
-              <XAxis
-                type="number"
-                dataKey="efficiency"
-                name="Efficiency Score"
-                domain={[0, 'dataMax']}
-              />
-              <YAxis
-                type="number"
-                dataKey="incremental"
-                name="Incremental ROI Score"
-                domain={[0, 'dataMax']}
-              />
-              <Tooltip
-                cursor={{ strokeDasharray: '3 3' }}
-                formatter={(value) => [typeof value === 'number' ? value.toFixed(2) : value]}
-                labelFormatter={(label, payload) => {
-                  if (payload && payload.length > 0) {
-                    return `${platform === 'Blinkit' ? 'Campaign' : 'Product'}: ${payload[0]?.payload?.name}`;
-                  }
-                  return '';
-                }}
-              />
-              <Scatter
-                dataKey="allocation"
-                fill="#8884d8"
-                name="Budget Allocation (₹K)"
-              />
-            </ScatterChart>
+            <Quadrant data={efficiencyChart.map((d) => ({
+              x: d.efficiency,
+              y: d.incremental,
+              name: d.name
+            }))} name="Growth" unit=" x" />
+          </ResponsiveContainer>
+
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>Efficiency vs Budget Analysis</CardTitle>
+          <CardDescription>
+            Products positioned by efficiency score and budget allocation
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ResponsiveContainer width="100%" height={400}>
+            <Quadrant data={efficiencyChart.map((d) => ({
+              x: d.allocation,
+              y: d.efficiency,
+              // z: d.incremental,
+              name: d.name
+            }))} name="Budget" unit=" ₹" />
           </ResponsiveContainer>
         </CardContent>
       </Card>
@@ -243,8 +240,8 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ results, total
               <TableHeader>
                 <TableRow>
                   <TableHead>Rank</TableHead>
-                  <TableHead>{`${platform === "Blinkit" ? 'Campaign' : 'Product'}`}</TableHead>
-                  <TableHead className="text-right">Current Sales</TableHead>
+                  <TableHead>Campaign</TableHead>
+                  <TableHead className="text-right">Sales P2</TableHead>
                   <TableHead className="text-right">Sales Change</TableHead>
                   <TableHead className="text-right">Spend Change</TableHead>
                   <TableHead className="text-right">Efficiency Score</TableHead>
@@ -260,7 +257,7 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ results, total
                     <TableCell className="font-medium">#{index + 1}</TableCell>
                     <TableCell>
                       <div>
-                        <div className="font-medium">{product['ProductName'] || product['Campaign Name']}</div>
+                        <div className="font-medium">{product['Campaign Name']}</div>
                         <div className="text-sm text-gray-500">{product['ProductID'] || product['Targeting Value']}</div>
                       </div>
                     </TableCell>

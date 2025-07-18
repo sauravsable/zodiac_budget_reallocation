@@ -32,9 +32,9 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ results, total
 
   // Chart data
   const topProductsChart = results.slice(0, 10).map(p => ({
-    name: (p['ProductName'] || p['Campaign Name'])?.length > 15
-      ? (p['ProductName'] || p['Campaign Name']).substring(0, 15) + '...'
-      : (p['ProductName'] || p['Campaign Name']),
+    name:  p['Campaign Name']?.length > 15
+      ? p['Campaign Name'].substring(0, 15) + '...'
+      : p['Campaign Name'],
     allocation: p.New_Budget_Allocation,
     multiplier: p.Budget_Multiplier,
     isEfficiency: p.isEfficiencyWinner
@@ -44,7 +44,7 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ results, total
     efficiency: p.Efficiency_Score,
     incremental: p.Incremental_ROI_Score,
     allocation: p.New_Budget_Allocation,
-    name: p['ProductName'] || p['Campaign Name'],
+    name: p['Campaign Name'],
   }));
 
   const budgetDistribution = [
@@ -61,8 +61,8 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ results, total
             <div className="flex items-center gap-2">
               <Target className="h-5 w-5 text-blue-500" />
               <div>
-                <div className="text-2xl font-bold text-blue-600">{uniqueProducts?.size}</div>
-                <div className="text-sm text-gray-600">Products Funded</div>
+                <div className="text-2xl font-bold text-blue-600">{fundedProducts.length}</div>
+                <div className="text-sm text-gray-600">Campaigns Funded</div>
               </div>
             </div>
           </CardContent>
@@ -128,7 +128,7 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ results, total
         <Card>
           <CardHeader>
             <CardTitle>Top 10 Budget Allocations</CardTitle>
-            <CardDescription>Products receiving the highest budget allocation</CardDescription>
+            <CardDescription>Campaigns receiving the highest budget allocation</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
@@ -241,8 +241,8 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ results, total
               <TableHeader>
                 <TableRow>
                   <TableHead>Rank</TableHead>
-                  <TableHead>{`${platform === "Blinkit" ? 'Campaign' : 'Product'}`}</TableHead>
-                  <TableHead className="text-right">Current Sales</TableHead>
+                  <TableHead>Campaign</TableHead>
+                  <TableHead className="text-right">Sales P2</TableHead>
                   <TableHead className="text-right">Sales Change</TableHead>
                   <TableHead className="text-right">Spend Change</TableHead>
                   <TableHead className="text-right">Efficiency Score</TableHead>
@@ -258,7 +258,7 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ results, total
                     <TableCell className="font-medium">#{index + 1}</TableCell>
                     <TableCell>
                       <div>
-                        <div className="font-medium">{product['ProductName'] || product['Campaign Name']}</div>
+                        <div className="font-medium">{product['Campaign Name']}</div>
                         <div className="text-sm text-gray-500">{product['ProductID'] || product['Targeting Value']}</div>
                       </div>
                     </TableCell>

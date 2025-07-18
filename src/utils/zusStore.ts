@@ -1,6 +1,11 @@
-import { create } from 'zustand'
+import { create } from 'zustand';
 
-export const usePlatformStore = create((set) => ({
+type PlatformStore = {
+    platform: string;
+    setPlatform: (newPlatform: string) => void;
+}
+
+export const usePlatformStore = create<PlatformStore>((set) => ({
     platform: "Blinkit",
-    setPlatform: () => set((state) => ({ platform: state.platform })),
-}))
+    setPlatform: (newPlatform: string) => set({ platform: newPlatform }),
+}));

@@ -46,15 +46,30 @@ const QuadrantChart = ({ data, name, unit }) => {
                 />
                 <Tooltip
                     cursor={{ strokeDasharray: "3 3" }}
-                    formatter={(value, name) => {
-                        if (name === "x") return [`${value}`, "Budget"];
-                        if (name === "y") return [`${value}`, `Efficiency (${name})`];
-                        return [value, name];
-                    }}
-                    labelFormatter={(label, payload) => {
-                        return payload && payload[0]?.payload?.name;
+                    content={({ payload }) => {
+                        if (!payload || payload.length === 0) return null;
+
+                        const { x, y, name: campaignName } = payload[0].payload;
+
+                        return (
+                            <div
+                                style={{
+                                    background: "#fff",
+                                    border: "1px solid #ccc",
+                                    padding: "10px",
+                                    fontSize: "14px",
+                                }}
+                            >
+                                <strong>{campaignName}</strong>
+                                <br />
+                                {name}: {x.toFixed(2)}
+                                <br />
+                                Efficiency: {y.toFixed(2)}
+                            </div>
+                        );
                     }}
                 />
+
                 <Scatter name="Products" data={data} fill="#8884d8">
                     {data.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />

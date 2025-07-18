@@ -20,7 +20,6 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ results, total
 
 
   const fundedProducts = results.filter(p => p.New_Budget_Allocation > 0);
-  const uniqueProducts = new Set(fundedProducts.map(p => p['Campaign Name']));
   const efficiencyWinners = results.filter(p => p.isEfficiencyWinner);
   const platform = usePlatformStore((state) => state.platform);
 
@@ -61,7 +60,7 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ results, total
             <div className="flex items-center gap-2">
               <Target className="h-5 w-5 text-blue-500" />
               <div>
-                <div className="text-2xl font-bold text-blue-600">{uniqueProducts.size}</div>
+                <div className="text-2xl font-bold text-blue-600">{fundedProducts.length}</div>
                 <div className="text-sm text-gray-600">Campaigns Funded</div>
               </div>
             </div>

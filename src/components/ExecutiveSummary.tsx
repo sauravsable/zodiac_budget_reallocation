@@ -14,15 +14,12 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({ results, tot
   console.log(results, "ExecutiveSummary component rendered with results:");
 
   const fundedProducts = results.filter(r => r.New_Budget_Allocation > 0);
-  const fundedProductCount=new Set(fundedProducts.map(p => p['ProductID'] || p['Campaign Name']));
   const efficiencyWinners = results.filter(r => r.isEfficiencyWinner);
   const topPerformers = fundedProducts.slice(0, 5);
-  const uniqueProducts = new Set(fundedProducts.map(p => p['ProductID'] || p['Campaign Name']));
 
   const metrics = {
-    totalProducts: uniqueProducts.size,
-    fundedCount: fundedProductCount.size,
-    fundingRate: (fundedProductCount.size / uniqueProducts.size) * 100,
+    fundedCount: fundedProducts.length,
+    fundingRate: (fundedProducts.length / results.length) * 100,
     efficiencyWinnersCount: efficiencyWinners.length,
     efficiencyWinnersFunded: efficiencyWinners.filter(r => r.New_Budget_Allocation > 0).length,
     totalAllocated: fundedProducts.reduce((sum, r) => sum + r.New_Budget_Allocation, 0),
@@ -31,7 +28,7 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({ results, tot
     portfolioROI: fundedProducts.reduce((sum, r) => sum + r.Projected_Sales_Increase, 0) /
       fundedProducts.reduce((sum, r) => sum + r.New_Budget_Allocation, 0),
     avgMultiplier: fundedProducts.reduce((sum, r) => sum + r.Budget_Multiplier, 0) / fundedProducts.length
-  };
+  };
 
   const recommendations = [
     {
@@ -69,7 +66,7 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({ results, tot
             Executive Summary
           </CardTitle>
           <CardDescription className="text-lg">
-            Strategic budget reallocation analysis for {metrics.totalProducts} Campaigns
+            Strategic budget reallocation analysis for {results.length} Campaigns
           </CardDescription>
         </CardHeader>
       </Card>

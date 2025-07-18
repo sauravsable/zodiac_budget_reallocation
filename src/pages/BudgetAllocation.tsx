@@ -88,7 +88,6 @@ const BudgetAllocation = () => {
   const [csvData, setCsvData] = useState([]);
   const [csvData2, setCsvData2] = useState([]);
   const [isUpload, setisUpload] = useState(false);
-  const [productCount, setproductCount] = useState(0);
   const [totalBudget, setTotalBudget] = useState<string>("");
   const [analysisResults, setAnalysisResults] = useState<AnalysisResult[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -194,33 +193,6 @@ const BudgetAllocation = () => {
 
   console.log("csvdata2", csvData2, csvData);
 
-  useEffect(() => {
-    let mergedresult;
-    let results;
-    if (platform === "Blinkit" && csvData.length > 0 && csvData2.length > 0) {
-      mergedresult = mergeBudgetDataBlinkit(csvData, csvData2);
-      const count = new Set();
-      mergedresult.forEach((item) => {
-        if (item["Campaign Name"]) {
-          count.add(item["Campaign Name"]);
-        }
-      });
-      setproductCount(count.size)
-      console.log("mergedresult", mergedresult);
-      console.log("results Blinkit", results);
-
-    }
-    if (platform === "Zepto" && csvData.length > 0 && csvData2.length > 0) {
-      mergedresult = mergeBudgetDataZepto(csvData, csvData2);
-      const count = new Set();
-      mergedresult.forEach((item) => {
-        if (item["ProductID"]) {
-          count.add(item["ProductID"]);
-        }
-      });
-      setproductCount(count.size)
-    }
-  }, [csvData, csvData2, platform]);
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 text-gray-700 flex">
@@ -401,7 +373,7 @@ const BudgetAllocation = () => {
                           <div className="grid grid-cols-2 gap-4 text-sm text-gray-700">
                             <div>
                               <span className="text-gray-500">Campaign: </span>
-                              <span className="ml-2 font-medium">{productCount}</span>
+                              <span className="ml-2 font-medium">{csvData.length}</span>
                             </div>
                             <div>
                               <span className="text-gray-500">Current Total Sales:</span>

@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import {
   Calculator,
   BarChart3,
@@ -194,6 +194,34 @@ const BudgetAllocation = () => {
 
   console.log("csvdata2", csvData2, csvData);
 
+  useEffect(() => {
+    let mergedresult;
+    let results;
+    if (platform === "Blinkit" && csvData.length > 0 && csvData2.length > 0) {
+      mergedresult = mergeBudgetDataBlinkit(csvData, csvData2);
+      const count = new Set();
+      mergedresult.forEach((item) => {
+        if (item["Campaign Name"]) {
+          count.add(item["Campaign Name"]);
+        }
+      });
+      setproductCount(count.size)
+      console.log("mergedresult", mergedresult);
+      console.log("results Blinkit", results);
+
+    }
+    if (platform === "Zepto" && csvData.length > 0 && csvData2.length > 0) {
+      mergedresult = mergeBudgetDataZepto(csvData, csvData2);
+      const count = new Set();
+      mergedresult.forEach((item) => {
+        if (item["ProductID"]) {
+          count.add(item["ProductID"]);
+        }
+      });
+      setproductCount(count.size)
+    }
+  }, [csvData, csvData2, platform]);
+
   return (
     <div className="min-h-screen w-full bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 text-gray-700 flex">
 
@@ -372,7 +400,7 @@ const BudgetAllocation = () => {
                           <h4 className="text-base font-semibold text-gray-800 mb-3">Data Summary</h4>
                           <div className="grid grid-cols-2 gap-4 text-sm text-gray-700">
                             <div>
-                              <span className="text-gray-500">{`${platform==="Blinkit"?'Campaign: ':'Product: '}`}</span>
+                              <span className="text-gray-500">Campaign: </span>
                               <span className="ml-2 font-medium">{productCount}</span>
                             </div>
                             <div>

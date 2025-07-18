@@ -106,6 +106,7 @@ const BudgetAllocation = () => {
   const [csvData2, setCsvData2] = useState<BudgetData[]>([]);
   // const [isFirstFileUploaded, setIsFirstFileUploaded] = useState(false);
   const [isUpload, setisUpload] = useState(false);
+  const [productCount, setproductCount] = useState(0);
   const [totalBudget, setTotalBudget] = useState<string>("");
   const [analysisResults, setAnalysisResults] = useState<AnalysisResult[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -161,6 +162,13 @@ const BudgetAllocation = () => {
       let results;
       if (platform === "Blinkit") {
         mergedresult = mergeBudgetDataBlinkit(csvData, csvData2);
+        const count = new Set();
+        mergedresult.forEach((item) => {
+          if (item["Campaign Name"]) {
+            count.add(item["Campaign Name"]);
+          }
+        });
+        setproductCount(count.size)
         console.log("mergedresult", mergedresult);
         results = processCSVDataBlinkit(mergedresult, budget);
         console.log("results Blinkit", results);
@@ -168,6 +176,13 @@ const BudgetAllocation = () => {
       }
       if (platform === "Zepto") {
         mergedresult = mergeBudgetData(csvData, csvData2);
+        const count = new Set();
+        mergedresult.forEach((item) => {
+          if (item["ProductID"]) {
+            count.add(item["ProductID"]);
+          }
+        });
+        setproductCount(count.size)
         results = processCSVData(mergedresult, budget);
       }
 
@@ -218,9 +233,40 @@ const BudgetAllocation = () => {
 
   console.log("csvdata2", csvData2, csvData);
 
+  useEffect(() => {
+    let mergedresult;
+    let results;
+    if (platform === "Blinkit" && csvData.length > 0 && csvData2.length > 0) {
+      mergedresult = mergeBudgetDataBlinkit(csvData, csvData2);
+      const count = new Set();
+      mergedresult.forEach((item) => {
+        if (item["Campaign Name"]) {
+          count.add(item["Campaign Name"]);
+        }
+      });
+      setproductCount(count.size)
+      console.log("mergedresult", mergedresult);
+      console.log("results Blinkit", results);
+
+    }
+    if (platform === "Zepto" && csvData.length > 0 && csvData2.length > 0) {
+      mergedresult = mergeBudgetData(csvData, csvData2);
+      const count = new Set();
+      mergedresult.forEach((item) => {
+        if (item["ProductID"]) {
+          count.add(item["ProductID"]);
+        }
+      });
+      setproductCount(count.size)
+    }
+  }, [csvData, csvData2, platform]);
+
+  console.log(productCount, "productCount");
+
+
   return (
     <div className="min-h-screen w-full bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 text-gray-700 flex">
-     
+
       <div className="h-screen">
         {/* Header */}
         <div className=" border-b border-border">
@@ -432,8 +478,8 @@ const BudgetAllocation = () => {
                           <h4 className="text-base font-semibold text-gray-800 mb-3">Data Summary</h4>
                           <div className="grid grid-cols-2 gap-4 text-sm text-gray-700">
                             <div>
-                              <span className="text-gray-500">Products:</span>
-                              <span className="ml-2 font-medium">{csvData.length}</span>
+                              <span className="text-gray-500">{`${platform==="Blinkit"?'Campaign: ':'Product: '}`}</span>
+                              <span className="ml-2 font-medium">{productCount}</span>
                             </div>
                             <div>
                               <span className="text-gray-500">Current Total Sales:</span>
@@ -616,7 +662,7 @@ const BudgetAllocation = () => {
               {csvData.length > 0 && (
                 <div className="flex justify-center mt-5">
                   <div className="w-full max-w-6xl">
-                    <DataPreview data={platform === "Blinkit" ? mergeBudgetDataBlinkit(csvData, csvData2) : mergeBudgetData(csvData, csvData2)} />
+                    <DataPreview productCount={productCount} data={platform === "Blinkit" ? mergeBudgetDataBlinkit(csvData, csvData2) : mergeBudgetData(csvData, csvData2)} />
                   </div>
                 </div>
               )}

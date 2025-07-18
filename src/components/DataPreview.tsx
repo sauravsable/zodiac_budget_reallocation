@@ -10,17 +10,18 @@ import { usePlatformStore } from '@/utils/zusStore';
 
 interface DataPreviewProps {
   data: BudgetDataZeptoReturn[] | BudgetDataBlinkitReturn[];
+  productCount?: number; // Optional prop for product count
 }
 
-export const DataPreview: React.FC<DataPreviewProps> = ({ data }) => {
+export const DataPreview: React.FC<DataPreviewProps> = ({ data, productCount }) => {
   console.log(data, "DataPreview component rendered with data:");
-  
+
   const previewData = data.slice(0, 5); // Show first 5 rows
   const platform = usePlatformStore((state) => state.platform);
 
 
   const stats = {
-    totalProducts: data.length,
+    totalProducts: productCount,
     totalSalesP2: data.reduce((sum, p) => sum + p['Total Sales - Period 2'], 0),
     totalSpendP2: data.reduce((sum, p) => sum + p['Total Spend - Period 2'], 0),
     positiveTrend: data.filter(p =>

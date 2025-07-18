@@ -14,32 +14,31 @@ import {
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "red", "pink"];
 
 
-const QuadrantChart = ({ rawData }) => {
-    const data = rawData.map((d) => ({
-        x: d.allocation,   // Budget
-        y: d.efficiency,   // Efficiency
-        name: d.name
-    }));
+const QuadrantChart = ({ data, name, unit }) => {
+
     return (
-        <div style={{ padding: "20px" }}>
+        <div style={{ padding: "10px" }}>
             <h3>Efficiency vs Budget Quadrant</h3>
             <ScatterChart
-                width={600}
-                height={400}
-                margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
+                width={1000}
+                height={350}
+                margin={{ top: 20, right: 20, bottom: 25, left: 20 }}
+
             >
                 <CartesianGrid />
                 <XAxis
                     type="number"
                     dataKey="x"
-                    name="Budget"
-                    unit=" ₹"
-                    label={{ value: "Budget", position: "insideBottomRight", offset: -10 }}
+                    name={name}
+                    unit={unit}
+                    domain={[0, 100]}
+                    label={{ value: name, position: "insideBottom", offset: -20, }}
                 />
                 <YAxis
                     type="number"
                     dataKey="y"
                     name="Efficiency"
+                    domain={[0, 100]}
                     label={{ value: "Efficiency", angle: -90, position: "insideLeft" }}
                 />
                 <Tooltip

@@ -11,21 +11,25 @@ interface ExecutiveSummaryProps {
 }
 
 export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({ results, totalBudget }) => {
+  console.log(results, "ExecutiveSummary component rendered with results:");
+
   const fundedProducts = results.filter(r => r.New_Budget_Allocation > 0);
+  const fundedProductCount=new Set(fundedProducts.map(p => p['ProductID'] || p['Campaign Name']));
   const efficiencyWinners = results.filter(r => r.isEfficiencyWinner);
   const topPerformers = fundedProducts.slice(0, 5);
+  const uniqueProducts = new Set(fundedProducts.map(p => p['ProductID'] || p['Campaign Name']));
 
   const metrics = {
-    totalProducts: results.length,
-    fundedCount: fundedProducts.length,
-    fundingRate: (fundedProducts.length / results.length) * 100,
+    totalProducts: uniqueProducts.size,
+    fundedCount: fundedProductCount.size,
+    fundingRate: (fundedProductCount.size / uniqueProducts.size) * 100,
     efficiencyWinnersCount: efficiencyWinners.length,
     efficiencyWinnersFunded: efficiencyWinners.filter(r => r.New_Budget_Allocation > 0).length,
     totalAllocated: fundedProducts.reduce((sum, r) => sum + r.New_Budget_Allocation, 0),
     budgetUtilization: (fundedProducts.reduce((sum, r) => sum + r.New_Budget_Allocation, 0) / totalBudget) * 100,
     expectedIncrease: fundedProducts.reduce((sum, r) => sum + r.Projected_Sales_Increase, 0),
-    portfolioROI: fundedProducts.reduce((sum, r) => sum + r.Projected_Sales_Increase, 0) / 
-                  fundedProducts.reduce((sum, r) => sum + r.New_Budget_Allocation, 0),
+    portfolioROI: fundedProducts.reduce((sum, r) => sum + r.Projected_Sales_Increase, 0) /
+      fundedProducts.reduce((sum, r) => sum + r.New_Budget_Allocation, 0),
     avgMultiplier: fundedProducts.reduce((sum, r) => sum + r.Budget_Multiplier, 0) / fundedProducts.length
   };
 
@@ -168,7 +172,7 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({ results, tot
                   </div>
                   <div>
                     <div className="font-medium flex items-center gap-2">
-                      {product['Product Name']}
+                      {product.ProductName || product['Campaign Name']}
                       {product.isEfficiencyWinner && (
                         <Badge className="bg-orange-100 text-orange-800">
                           <Zap className="h-3 w-3 mr-1" />
@@ -177,7 +181,7 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({ results, tot
                       )}
                     </div>
                     <div className="text-sm text-gray-500">
-                      Ranking Score: {product.Ranking_Score.toFixed(3)} | 
+                      Ranking Score: {product.Ranking_Score.toFixed(3)} |
                       Sales Change: {product.Incremental_Sales > 0 ? '+' : ''}₹{(product.Incremental_Sales).toFixed(0)}
                     </div>
                   </div>
@@ -202,10 +206,10 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({ results, tot
           <div className="space-y-4">
             {recommendations.map((rec, index) => {
               const IconComponent = rec.icon;
-              const colorClass = rec.type === 'success' ? 'text-green-600 bg-green-50' : 
-                                rec.type === 'warning' ? 'text-orange-600 bg-orange-50' : 
-                                'text-blue-600 bg-blue-50';
-              
+              const colorClass = rec.type === 'success' ? 'text-green-600 bg-green-50' :
+                rec.type === 'warning' ? 'text-orange-600 bg-orange-50' :
+                  'text-blue-600 bg-blue-50';
+
               return (
                 <div key={index} className="flex items-start gap-4 p-4 rounded-lg border">
                   <div className={`p-2 rounded-lg ${colorClass}`}>

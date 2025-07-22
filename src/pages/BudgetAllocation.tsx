@@ -9,7 +9,13 @@ import {
   Target,
   Zap,
 } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,10 +26,15 @@ import { BudgetUpload } from "@/components/BudgetUpload";
 import { AnalysisResults } from "@/components/AnalysisResults";
 import { DataPreview } from "@/components/DataPreview";
 import { ExecutiveSummary } from "@/components/ExecutiveSummary";
-import { processCSVData, mergeBudgetDataZepto, mergeBudgetDataBlinkit, processCSVDataBlinkit } from "@/utils/budgetAnalysis";
+import {
+  processCSVData,
+  mergeBudgetDataZepto,
+  mergeBudgetDataBlinkit,
+  processCSVDataBlinkit,
+} from "@/utils/budgetAnalysis";
 import PlatformSwitch from "@/components/PlatformSwitch";
 import { usePlatformStore } from "@/utils/zusStore";
-
+import { formatNumber } from "@/utils/numberFormatter";
 export interface BudgetDataZepto {
   CampaignName: string;
   Revenue: number;
@@ -32,14 +43,13 @@ export interface BudgetDataZepto {
 }
 
 export type BudgetDataZeptoReturn = {
-  'Campaign Name': string,
-  'Total Sales - Period 1': number,
-  'Total Spend - Period 1': number,
-  'ROI - Period 1': number,
-  'Total Sales - Period 2': number,
-  'Total Spend - Period 2': number,
-  'ROI - Period 2': number,
-}
+  "Campaign Name": string;
+  "Total Sales - Period 1": number;
+  "Total Spend - Period 1": number;
+  "Total Sales - Period 2": number;
+  "Total Spend - Period 2": number;
+};
+
 export type BudgetDataBlinkit = {
   "Campaign Name": string;
   "Targeting Value": string;
@@ -48,19 +58,15 @@ export type BudgetDataBlinkit = {
   "Indirect Sales": number;
   "Estimated Budget Consumed": number;
   "Total RoAS": number;
-}
+};
 
 export type BudgetDataBlinkitReturn = {
-  "Campaign Name": string,
-  "Targeting Value": string,
-  "Targeting Type": string,
-  'Total Sales - Period 1': number,
-  'Total Spend - Period 1': number,
-  'ROI - Period 1': number,
-  'Total Sales - Period 2': number,
-  'Total Spend - Period 2': number,
-  'ROI - Period 2': number,
-}
+  "Campaign Name": string;
+  "Total Sales - Period 1": number;
+  "Total Spend - Period 1": number;
+  "Total Sales - Period 2": number;
+  "Total Spend - Period 2": number;
+};
 
 type AnalysisResultBase = {
   Incremental_Sales: number;
@@ -80,7 +86,8 @@ type AnalysisResultBase = {
 
 export type AnalysisResultZepto = BudgetDataZeptoReturn & AnalysisResultBase;
 
-export type AnalysisResultBlinkit = BudgetDataBlinkitReturn & AnalysisResultBase;
+export type AnalysisResultBlinkit = BudgetDataBlinkitReturn &
+  AnalysisResultBase;
 
 export type AnalysisResult = AnalysisResultZepto | AnalysisResultBlinkit;
 
@@ -141,7 +148,6 @@ const BudgetAllocation = () => {
       let results;
       if (platform === "Blinkit") {
         mergedresult = mergeBudgetDataBlinkit(csvData, csvData2);
-        console.log("mergedresult", mergedresult);
         results = processCSVDataBlinkit(mergedresult, budget);
       }
       if (platform === "Zepto") {
@@ -174,7 +180,9 @@ const BudgetAllocation = () => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `budget_analysis_${new Date().toISOString().split("T")[0]}.csv`;
+    a.download = `budget_analysis_${
+      new Date().toISOString().split("T")[0]
+    }.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -183,28 +191,38 @@ const BudgetAllocation = () => {
     analysisResults.length > 0
       ? {
           totalProducts: analysisResults.length,
-          fundedProducts: analysisResults.filter((p) => p.New_Budget_Allocation > 0).length,
-          efficiencyWinners: analysisResults.filter((p) => p.isEfficiencyWinner).length,
-          totalAllocated: analysisResults.reduce((sum, p) => sum + p.New_Budget_Allocation, 0),
-          expectedIncrease: analysisResults.reduce((sum, p) => sum + p.Projected_Sales_Increase, 0),
+          fundedProducts: analysisResults.filter(
+            (p) => p.New_Budget_Allocation > 0
+          ).length,
+          efficiencyWinners: analysisResults.filter((p) => p.isEfficiencyWinner)
+            .length,
+          totalAllocated: analysisResults.reduce(
+            (sum, p) => sum + p.New_Budget_Allocation,
+            0
+          ),
+          expectedIncrease: analysisResults.reduce(
+            (sum, p) => sum + p.Projected_Sales_Increase,
+            0
+          ),
         }
       : null;
 
   console.log("csvdata2", csvData2, csvData);
 
-
   return (
     <div className="min-h-screen w-full bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 text-gray-700 flex">
-
       <div className="h-screen">
         {/* Header */}
         <div className=" border-b border-border">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <div className="flex items-center justify-between">
               <div className="w-full py-2 ">
-                <h1 className="text-3xl font-bold text-foreground text-center gap-3 w-full">Budget Allocation</h1>
+                <h1 className="text-3xl font-bold text-foreground text-center gap-3 w-full">
+                  Budget Allocation
+                </h1>
                 <p className="text-muted-foreground mt-1 w-full text-center">
-                  Comprehensive Budget Allocation Analysis with Optimized Efficiency Gains
+                  Comprehensive Budget Allocation Analysis with Optimized
+                  Efficiency Gains
                 </p>
               </div>
             </div>
@@ -230,11 +248,15 @@ const BudgetAllocation = () => {
               <div className="flex justify-center">
                 <div className="w-full  space-y-6">
                   <div className="w-1/2 mx-auto">
-                    <BudgetUpload id="file-upload-2" onDataUpload={handleDataUpload2} />
+                    <BudgetUpload
+                      id="file-upload-2"
+                      onDataUpload={handleDataUpload2}
+                    />
                   </div>
 
                   <div className="text-xs text-gray-400 text-center">
-                    <span className="font-medium">Requirement:</span> Upload a sheet.
+                    <span className="font-medium">Requirement:</span> Upload a
+                    sheet.
                   </div>
 
                   <Card className="relative mx-auto w-5/6  overflow-hidden rounded-xl bg-gradient-to-br from-white to-gray-50 shadow-md border border-gray-200">
@@ -246,7 +268,8 @@ const BudgetAllocation = () => {
                         Key Features
                       </CardTitle>
                       <CardDescription className="mt-2 text-base text-gray-600">
-                        Supercharge your campaigns with AI-driven performance tools
+                        Supercharge your campaigns with AI-driven performance
+                        tools
                       </CardDescription>
                     </CardHeader>
 
@@ -254,19 +277,23 @@ const BudgetAllocation = () => {
                       {[
                         {
                           title: "Opportunity Finder",
-                          description: "Identifies hidden growth areas across low-visibility campaigns.",
+                          description:
+                            "Identifies hidden growth areas across low-visibility campaigns.",
                         },
                         {
                           title: "Auto Scaling",
-                          description: "Allocates more budget to top-performers — instantly and intelligently.",
+                          description:
+                            "Allocates more budget to top-performers — instantly and intelligently.",
                         },
                         {
                           title: "Performance Index",
-                          description: "Combines spend, ROI, and growth potential into a single score.",
+                          description:
+                            "Combines spend, ROI, and growth potential into a single score.",
                         },
                         {
                           title: "Predictive Insights",
-                          description: "Forecasts success and suggests optimizations with AI modeling.",
+                          description:
+                            "Forecasts success and suggests optimizations with AI modeling.",
                         },
                       ].map((feature, index) => (
                         <div
@@ -275,8 +302,12 @@ const BudgetAllocation = () => {
                         >
                           <CheckCircle className="h-5 w-5 text-green-500 mt-1 flex-shrink-0" />
                           <div>
-                            <h4 className="text-lg font-semibold text-gray-800">{feature.title}</h4>
-                            <p className="text-sm text-gray-600 mt-1">{feature.description}</p>
+                            <h4 className="text-lg font-semibold text-gray-800">
+                              {feature.title}
+                            </h4>
+                            <p className="text-sm text-gray-600 mt-1">
+                              {feature.description}
+                            </p>
                           </div>
                         </div>
                       ))}
@@ -285,30 +316,37 @@ const BudgetAllocation = () => {
                   <Card className="w-5/6 mx-auto shadow-md border border-gray-200">
                     <CardHeader>
                       <CardTitle>Analysis Methodology</CardTitle>
-                      <CardDescription>How the advanced algorithm works</CardDescription>
+                      <CardDescription>
+                        How the advanced algorithm works
+                      </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                       <div className="space-y-3 flex flex-row item-center justify-between flex-wrap">
                         <div className="border-l-4 border-blue-500 pl-3 w-1/2">
                           <h4 className="font-medium">1. Efficiency Scoring</h4>
                           <p className="text-sm text-muted-foreground">
-                            Products with increased sales and reduced spend get bonus points
+                            Products with increased sales and reduced spend get
+                            bonus points
                           </p>
                         </div>
                         <div className="border-l-4 border-green-500 pl-3 w-1/2">
                           <h4 className="font-medium">2. Weighted Ranking</h4>
-                          <p className="text-sm text-muted-foreground">30% efficiency + 70% incremental performance</p>
+                          <p className="text-sm text-muted-foreground">
+                            30% efficiency + 70% incremental performance
+                          </p>
                         </div>
                         <div className="border-l-4 border-purple-500 pl-3 w-1/2">
                           <h4 className="font-medium">3. Smart Allocation</h4>
                           <p className="text-sm text-muted-foreground">
-                            Up to 3x budget for efficiency winners, 2.5x for top performers
+                            Up to 3x budget for efficiency winners, 2.5x for top
+                            performers
                           </p>
                         </div>
                         <div className="border-l-4 border-orange-500 pl-3 w-1/2">
                           <h4 className="font-medium">4. ROI Projection</h4>
                           <p className="text-sm text-muted-foreground">
-                            Forecasts sales increases based on allocation multipliers
+                            Forecasts sales increases based on allocation
+                            multipliers
                           </p>
                         </div>
                       </div>
@@ -331,7 +369,10 @@ const BudgetAllocation = () => {
 
                     {/* Upload Component */}
                     <div className="mb-6">
-                      <BudgetUpload id="file-upload-1" onDataUpload={handleDataUpload} />
+                      <BudgetUpload
+                        id="file-upload-1"
+                        onDataUpload={handleDataUpload}
+                      />
                     </div>
 
                     <div className="bg-white shadow-lg border border-gray-200 rounded-xl p-2 space-y-4">
@@ -341,16 +382,23 @@ const BudgetAllocation = () => {
                           <Currency className="h-6 w-6 text-green-500" />
                           Budget Configuration
                         </div>
-                        <p className="text-sm text-gray-500 mt-1">Set your total budget for reallocation analysis</p>
+                        <p className="text-sm text-gray-500 mt-1">
+                          Set your total budget for reallocation analysis
+                        </p>
                       </div>
 
                       {/* Budget Input */}
                       <div className="space-y-1">
-                        <Label htmlFor="budget" className="text-sm font-medium text-gray-700">
+                        <Label
+                          htmlFor="budget"
+                          className="text-sm font-medium text-gray-700"
+                        >
                           Total Budget
                         </Label>
                         <div className="relative mt-1">
-                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">₹</span>
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">
+                            ₹
+                          </span>
                           <Input
                             id="budget"
                             type="number"
@@ -361,33 +409,44 @@ const BudgetAllocation = () => {
                           />
                         </div>
                         <p className="text-xs text-gray-500 mt-1">
-                          You entered: ₹{totalBudget ? parseFloat(totalBudget).toFixed(2) : "0.00"}
+                          You entered: ₹
+                          {totalBudget
+                            ? formatNumber(Number(totalBudget))
+                            : "0.00"}
                         </p>
                       </div>
 
                       {/* CSV Summary */}
-                      {csvData.length > 0 && (
+                      {csvData2.length > 0 && (
                         <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                          <h4 className="text-base font-semibold text-gray-800 mb-3">Data Summary</h4>
+                          <h4 className="text-base font-semibold text-gray-800 mb-3">
+                            Data Summary
+                          </h4>
                           <div className="grid grid-cols-2 gap-4 text-sm text-gray-700">
                             <div>
-                              <span className="text-gray-500">Campaign: </span>
-                              <span className="ml-2 font-medium">{csvData.length}</span>
+                              <span className="text-gray-500">Total Campaigns: </span>
+                              <span className="ml-2 font-medium">
+                                {new Set(csvData2.map(p => p["Campaign Name"])).size}
+                              </span>
                             </div>
                             <div>
-                              <span className="text-gray-500">Current Total Sales:</span>
+                              <span className="text-gray-500">
+                                Current Total Sales:
+                              </span>
                               <span className="ml-2 font-medium">
                                 ₹
-                                {csvData
-                                  .reduce((sum, p) => {
+                                {(
+                                  csvData2.reduce((sum, p) => {
                                     const revenue = p["Revenue"];
                                     const value =
                                       revenue !== undefined && revenue !== null
                                         ? Number(revenue)
-                                        : Number(p["Direct Sales"] || 0) + Number(p["Indirect Sales"] || 0);
+                                        : Number(p["Direct Sales"] || 0) +
+                                          Number(p["Indirect Sales"] || 0);
                                     return sum + value;
-                                  }, 0)
-                                  .toFixed(0)}
+                                  }, 0) / 100000
+                                ).toFixed(2)}{" "}
+                                Lakh
                               </span>
                             </div>
                           </div>
@@ -397,7 +456,9 @@ const BudgetAllocation = () => {
                       {/* Run Button */}
                       <Button
                         onClick={runAnalysis}
-                        disabled={!csvData.length || !totalBudget || isAnalyzing}
+                        disabled={
+                          !csvData.length || !totalBudget || isAnalyzing
+                        }
                         className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white text-sm font-semibold py-2.5"
                         size="lg"
                       >
@@ -409,7 +470,9 @@ const BudgetAllocation = () => {
                       {isAnalyzing && (
                         <div className="space-y-2">
                           <Progress value={progress} className="w-full" />
-                          <p className="text-sm text-center text-gray-500">Processing budget allocation algorithm...</p>
+                          <p className="text-sm text-center text-gray-500">
+                            Processing budget allocation algorithm...
+                          </p>
                         </div>
                       )}
                     </div>
@@ -435,14 +498,18 @@ const BudgetAllocation = () => {
                           </div>
                         </div>
                       </div>
-                      <AnalysisResults results={analysisResults} totalBudget={parseFloat(totalBudget)} />
+                      <AnalysisResults
+                        results={analysisResults}
+                        totalBudget={parseFloat(totalBudget)}
+                      />
                     </div>
                   ) : (
                     <Card>
                       <CardContent className="py-12 text-center">
                         <BarChart3 className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                         <p className="text-muted-foreground">
-                          No analysis results yet. Please configure and run the analysis first.
+                          No analysis results yet. Please configure and run the
+                          analysis first.
                         </p>
                       </CardContent>
                     </Card>
@@ -452,20 +519,30 @@ const BudgetAllocation = () => {
               {csvData.length > 0 && (
                 <div className="flex justify-center mt-5">
                   <div className="w-full max-w-6xl">
-                    <DataPreview data={platform === "Blinkit" ? mergeBudgetDataBlinkit(csvData, csvData2) : mergeBudgetDataZepto(csvData, csvData2)} />
+                    <DataPreview
+                      data={
+                        platform === "Blinkit"
+                          ? mergeBudgetDataBlinkit(csvData, csvData2)
+                          : mergeBudgetDataZepto(csvData, csvData2)
+                      }
+                    />
                   </div>
                 </div>
               )}
               <div className="flex justify-center mt-10">
                 <div className="w-full max-w-6xl">
                   {analysisResults.length > 0 ? (
-                    <ExecutiveSummary results={analysisResults} totalBudget={parseFloat(totalBudget)} />
+                    <ExecutiveSummary
+                      results={analysisResults}
+                      totalBudget={parseFloat(totalBudget)}
+                    />
                   ) : (
                     <Card>
                       <CardContent className="py-12 text-center">
                         <Target className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                         <p className="text-muted-foreground">
-                          Executive summary will appear here after running the analysis.
+                          Executive summary will appear here after running the
+                          analysis.
                         </p>
                       </CardContent>
                     </Card>

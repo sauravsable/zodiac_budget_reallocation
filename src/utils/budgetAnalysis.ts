@@ -5,56 +5,109 @@ export function mergeBudgetDataZepto(
   data1: BudgetDataZepto[],
   data2: BudgetDataZepto[]
 ): BudgetDataZeptoReturn[] {
-  const map1 = new Map<string, BudgetDataZepto>();
+  const map = new Map<string, BudgetDataZeptoReturn>();
+
+  const toNumber = (val: any) => Number(val) || 0;
 
   data1.forEach(item => {
-    const key = `${item.CampaignName}`;
-    map1.set(key, item);
-  });
+    const key = item.CampaignName;
 
-  return data2.map(item2 => {
-    const key = `${item2.CampaignName}`;
-    const item1 = map1.get(key) ?? {};
+    const sales1 = toNumber(item.Revenue);
+    const spend1 = toNumber(item.Spend);
 
-    return {
-      'Campaign Name': item2['CampaignName'],
-      'Total Sales - Period 1': Number(item1['Revenue'] ?? 0),
-      'Total Spend - Period 1': Number(item1['Spend'] ?? 0),
-      'ROI - Period 1': Number(item1['Roas'] ?? 0),
-      'Total Sales - Period 2': Number(item2['Revenue'] ?? 0),
-      'Total Spend - Period 2': Number(item2['Spend'] ?? 0),
-      'ROI - Period 2': Number(item2['Roas'] ?? 0),
+    const existing = map.get(key) ?? {
+      'Campaign Name': key,
+      'Total Sales - Period 1': 0,
+      'Total Spend - Period 1': 0,
+      'Total Sales - Period 2': 0,
+      'Total Spend - Period 2': 0,
     };
+
+    existing['Total Sales - Period 1'] += sales1;
+    existing['Total Spend - Period 1'] += spend1;
+
+    map.set(key, existing);
   });
+
+  data2.forEach(item => {
+    const key = item.CampaignName;
+
+    const sales2 = toNumber(item.Revenue);
+    const spend2 = toNumber(item.Spend);
+
+    const existing = map.get(key) ?? {
+      'Campaign Name': key,
+      'Total Sales - Period 1': 0,
+      'Total Spend - Period 1': 0,
+      'Total Sales - Period 2': 0,
+      'Total Spend - Period 2': 0,
+    };
+
+    existing['Total Sales - Period 2'] += sales2;
+    existing['Total Spend - Period 2'] += spend2;
+
+    map.set(key, existing);
+  });
+
+  return Array.from(map.values());
 }
+
 export function mergeBudgetDataBlinkit(
   data1: BudgetDataBlinkit[],
   data2: BudgetDataBlinkit[]
 ): BudgetDataBlinkitReturn[] {
-  const map1 = new Map<string, BudgetDataBlinkit>();
+  const sum = (...values: (number | undefined)[]) =>
+    values.reduce((acc, val) => acc + (Number(val) || 0), 0);
 
+  // 1. Aggregate data1
+  const aggregatedData1 = new Map<string, { sales: number; spend: number }>();
   data1.forEach(item => {
-    const key = `${item['Campaign Name']}|${item['Targeting Value']}`;
-    map1.set(key, item);
+    const key = item['Campaign Name'];
+    const sales = sum(item['Direct Sales'], item['Indirect Sales']);
+    const spend = Number(item['Estimated Budget Consumed']) || 0;
+
+    if (aggregatedData1.has(key)) {
+      const existing = aggregatedData1.get(key)!;
+      existing.sales += sales;
+      existing.spend += spend;
+    } else {
+      aggregatedData1.set(key, { sales, spend });
+    }
   });
 
-  return data2.map(item2 => {
-    const key = `${item2['Campaign Name']}|${item2['Targeting Value']}`;
-    const item1 = map1.get(key) ?? {};
+  const aggregatedData2 = new Map<string, { sales: number; spend: number }>();
+  data2.forEach(item => {
+    const key = item['Campaign Name'];
+    const sales = sum(item['Direct Sales'], item['Indirect Sales']);
+    const spend = Number(item['Estimated Budget Consumed']) || 0;
 
-    return {
-      'Campaign Name': item2['Campaign Name'],
-      'Targeting Value': item2['Targeting Value'],
-      'Targeting Type': item2['Targeting Type'],
-      'Total Sales - Period 1': Number(item1['Direct Sales'] ?? 0) + Number(item1['Indirect Sales'] ?? 0),
-      'Total Spend - Period 1': Number(item1['Estimated Budget Consumed'] ?? 0),
-      'ROI - Period 1': Number(item1['Total RoAS'] ?? 0),
-      'Total Sales - Period 2': Number(item2['Direct Sales'] ?? 0) + Number(item2['Indirect Sales'] ?? 0),
-      'Total Spend - Period 2': Number(item2['Estimated Budget Consumed'] ?? 0),
-      'ROI - Period 2': Number(item2['Total RoAS'] ?? 0),
-    };
+    if (aggregatedData2.has(key)) {
+      const existing = aggregatedData2.get(key)!;
+      existing.sales += sales;
+      existing.spend += spend;
+    } else {
+      aggregatedData2.set(key, { sales, spend });
+    }
   });
+
+  const result: BudgetDataBlinkitReturn[] = [];
+  aggregatedData2.forEach((value1, key) => {
+    if (aggregatedData1.has(key)) {
+      const value2 = aggregatedData1.get(key)!;
+      result.push({
+        'Campaign Name': key,
+        'Total Sales - Period 1': value2.sales,
+        'Total Spend - Period 1': value2.spend,
+        'Total Sales - Period 2': value1.sales,
+        'Total Spend - Period 2': value1.spend,
+      });
+    }
+  });
+
+  return result;
 }
+
+
 
 export function processCSVData(data: BudgetDataZeptoReturn[], totalBudgetLakhs: number): AnalysisResultZepto[] {
   // Calculate incremental metrics
@@ -233,13 +286,13 @@ export function processCSVDataBlinkit(data: BudgetDataBlinkitReturn[], totalBudg
 
   // Sort by ranking score
   const sortedData = rankedData.sort((a, b) => {
-    if (b.Ranking_Score !== a.Ranking_Score) {
-      return b.Ranking_Score - a.Ranking_Score;
-    }
-    if (b.Incremental_Sales !== a.Incremental_Sales) {
-      return b.Incremental_Sales - a.Incremental_Sales;
-    }
-    return b.Current_ROI - a.Current_ROI;
+    // if (b.Ranking_Score !== a.Ranking_Score) {
+    //   return b.Ranking_Score - a.Ranking_Score;
+    // }
+    // if (b.Incremental_Sales !== a.Incremental_Sales) {
+    //   return b.Incremental_Sales - a.Incremental_Sales;
+    // }
+    return b.Ranking_Score - a.Ranking_Score;
   });
 
   // Allocate budget

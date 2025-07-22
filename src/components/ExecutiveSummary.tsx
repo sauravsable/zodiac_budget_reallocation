@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { TrendingUp, Currency, Target, Zap, Trophy, AlertTriangle, CheckCircle } from 'lucide-react';
 import { AnalysisResult } from '@/pages/BudgetAllocation';
-
+import { formatNumber } from '@/utils/numberFormatter';
 interface ExecutiveSummaryProps {
   results: AnalysisResult[];
   totalBudget: number;
@@ -28,7 +28,7 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({ results, tot
     portfolioROI: fundedProducts.reduce((sum, r) => sum + r.Projected_Sales_Increase, 0) /
       fundedProducts.reduce((sum, r) => sum + r.New_Budget_Allocation, 0),
     avgMultiplier: fundedProducts.reduce((sum, r) => sum + r.Budget_Multiplier, 0) / fundedProducts.length
-  };
+  };
 
   const recommendations = [
     {
@@ -104,7 +104,7 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({ results, tot
             <div className="flex items-center gap-2">
               <Currency className="h-5 w-5 text-blue-600" />
               <div>
-                <div className="text-2xl font-bold text-blue-600">₹{(metrics.totalAllocated).toFixed(0)}</div>
+                <div className="text-2xl font-bold text-blue-600">₹{formatNumber(metrics.totalAllocated)}</div>
                 <div className="text-sm text-blue-700">Budget Allocated</div>
                 <div className="text-xs text-blue-600">{metrics.budgetUtilization.toFixed(1)}% utilization</div>
               </div>
@@ -135,7 +135,7 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({ results, tot
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="text-center p-4 bg-green-50 rounded-lg">
-              <div className="text-3xl font-bold text-green-600 mb-2">₹{(metrics.expectedIncrease).toFixed(0)}</div>
+              <div className="text-3xl font-bold text-green-600 mb-2">₹{formatNumber(metrics.expectedIncrease)}</div>
               <div className="text-sm text-green-700 font-medium">Expected Sales Increase</div>
               <div className="text-xs text-green-600 mt-1">From optimized allocation</div>
             </div>
@@ -145,7 +145,7 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({ results, tot
               <div className="text-xs text-blue-600 mt-1">Across funded products</div>
             </div>
             <div className="text-center p-4 bg-purple-50 rounded-lg">
-              <div className="text-3xl font-bold text-purple-600 mb-2">₹{((totalBudget - metrics.totalAllocated)).toFixed(0)}</div>
+              <div className="text-3xl font-bold text-purple-600 mb-2">₹{formatNumber((totalBudget - metrics.totalAllocated))}</div>
               <div className="text-sm text-purple-700 font-medium">Remaining Budget</div>
               <div className="text-xs text-purple-600 mt-1">Available for adjustment</div>
             </div>
@@ -169,7 +169,7 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({ results, tot
                   </div>
                   <div>
                     <div className="font-medium flex items-center gap-2">
-                      {product.ProductName || product['Campaign Name']}
+                      {product['Campaign Name']}
                       {product.isEfficiencyWinner && (
                         <Badge className="bg-orange-100 text-orange-800">
                           <Zap className="h-3 w-3 mr-1" />
@@ -179,12 +179,12 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({ results, tot
                     </div>
                     <div className="text-sm text-gray-500">
                       Ranking Score: {product.Ranking_Score.toFixed(3)} |
-                      Sales Change: {product.Incremental_Sales > 0 ? '+' : ''}₹{(product.Incremental_Sales).toFixed(0)}
+                      Sales Change: {product.Incremental_Sales > 0 ? '+' : ''}{formatNumber(product.Incremental_Sales)}
                     </div>
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="font-bold text-green-600">₹{(product.New_Budget_Allocation).toFixed(0)}</div>
+                  <div className="font-bold text-green-600">₹{formatNumber(product.New_Budget_Allocation)}</div>
                   <div className="text-sm text-gray-500">{product.Budget_Multiplier.toFixed(1)}x multiplier</div>
                 </div>
               </div>
@@ -245,7 +245,7 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({ results, tot
             </div>
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
-              <span className="text-sm">Prepare contingency plan for remaining ₹{((totalBudget - metrics.totalAllocated)).toFixed(0)} budget</span>
+              <span className="text-sm">Prepare contingency plan for remaining ₹{(formatNumber(totalBudget - metrics.totalAllocated))} budget</span>
             </div>
           </div>
         </CardContent>

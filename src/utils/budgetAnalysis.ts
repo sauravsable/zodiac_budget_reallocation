@@ -5,51 +5,53 @@ export function mergeBudgetDataZepto(
   data1: BudgetDataZepto[],
   data2: BudgetDataZepto[]
 ): BudgetDataZeptoReturn[] {
-  const map = new Map<string, BudgetDataZeptoReturn>();
 
-  const toNumber = (val: any) => Number(val) || 0;
-
+  // 1. Aggregate data1
+  const aggregatedData1 = new Map<string, { sales: number; spend: number }>();
   data1.forEach(item => {
-    const key = item.CampaignName;
+    const key = item['CampaignName'];
+    const sales = Number(item['Revenue']);
+    const spend = Number(item['Spend']) || 0;
 
-    const sales1 = toNumber(item.Revenue);
-    const spend1 = toNumber(item.Spend);
-
-    const existing = map.get(key) ?? {
-      'Campaign Name': key,
-      'Total Sales - Period 1': 0,
-      'Total Spend - Period 1': 0,
-      'Total Sales - Period 2': 0,
-      'Total Spend - Period 2': 0,
-    };
-
-    existing['Total Sales - Period 1'] += sales1;
-    existing['Total Spend - Period 1'] += spend1;
-
-    map.set(key, existing);
+    if (aggregatedData1.has(key)) {
+      const existing = aggregatedData1.get(key)!;
+      existing.sales += sales;
+      existing.spend += spend;
+    } else {
+      aggregatedData1.set(key, { sales, spend });
+    }
   });
 
+  const aggregatedData2 = new Map<string, { sales: number; spend: number }>();
   data2.forEach(item => {
-    const key = item.CampaignName;
+    const key = item['CampaignName'];
+    const sales = Number(item['Revenue']);
+    const spend = Number(item['Spend']) || 0;
 
-    const sales2 = toNumber(item.Revenue);
-    const spend2 = toNumber(item.Spend);
-
-    const existing = map.get(key) ?? {
-      'Campaign Name': key,
-      'Total Sales - Period 1': 0,
-      'Total Spend - Period 1': 0,
-      'Total Sales - Period 2': 0,
-      'Total Spend - Period 2': 0,
-    };
-
-    existing['Total Sales - Period 2'] += sales2;
-    existing['Total Spend - Period 2'] += spend2;
-
-    map.set(key, existing);
+    if (aggregatedData2.has(key)) {
+      const existing = aggregatedData2.get(key)!;
+      existing.sales += sales;
+      existing.spend += spend;
+    } else {
+      aggregatedData2.set(key, { sales, spend });
+    }
   });
 
-  return Array.from(map.values());
+  const result: BudgetDataZeptoReturn[] = [];
+  aggregatedData2.forEach((value1, key) => {
+    if (aggregatedData1.has(key)) {
+      const value2 = aggregatedData1.get(key)!;
+      result.push({
+        'Campaign Name': key,
+        'Total Sales - Period 1': value2.sales,
+        'Total Spend - Period 1': value2.spend,
+        'Total Sales - Period 2': value1.sales,
+        'Total Spend - Period 2': value1.spend,
+      });
+    }
+  });
+
+  return result;
 }
 
 export function mergeBudgetDataBlinkit(

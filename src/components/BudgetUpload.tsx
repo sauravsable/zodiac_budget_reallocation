@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { BudgetDataZepto } from "@/pages/BudgetAllocation";
 import { usePlatformStore } from "@/utils/zusStore";
-import { parseCSV, parseXLSX } from "../utils/dataParse";
+import { parseCSV, parseXLSX, parseMultipleCSVSheetsSelected, parseXLSXSelectedSheets } from "../utils/dataParse";
 interface BudgetUploadProps {
   onDataUpload: (data: BudgetDataZepto[]) => void;
   id: string;
@@ -26,8 +26,6 @@ export const BudgetUpload: React.FC<BudgetUploadProps> = ({
       return {
         requiredColumns: [
           "Campaign Name",
-          "Targeting Value",
-          "Targeting Type",
           "Direct Sales",
           "Indirect Sales",
           "Estimated Budget Consumed",
@@ -43,6 +41,7 @@ export const BudgetUpload: React.FC<BudgetUploadProps> = ({
       };
     }
   }, [platform]);
+  
 
   const handleFileUpload = useCallback(
     async (file: File) => {
@@ -63,10 +62,21 @@ export const BudgetUpload: React.FC<BudgetUploadProps> = ({
       try {
         let data: any[] = [];
         if (isCSV) {
-          const text = await file.text();
-          data = parseCSV(text, requiredColumns);
+          // const text = await file.text();
+          // data = parseCSV(text, requiredColumns);
+          const content = await file.text();
+          data = parseMultipleCSVSheetsSelected(
+          [{ filename: file.name, content }],
+          requiredColumns,
+          ["PRODUCT_LISTING", "PRODUCT_RECOMMENDATION"]
+        );
         } else if (isXLSX) {
-          data = await parseXLSX(file, requiredColumns);
+          // data = await parseXLSX(file, requiredColumns);
+          data = await parseXLSXSelectedSheets(
+          file,
+          requiredColumns,
+          ["PRODUCT_LISTING", "PRODUCT_RECOMMENDATION"]
+        );
         }
         onDataUpload(data);
       } catch (err) {

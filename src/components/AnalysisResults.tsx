@@ -16,8 +16,6 @@ interface AnalysisResultsProps {
 }
 
 export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ results, totalBudget }) => {
-  console.log(results, "analysis");
-
 
   const fundedProducts = results.filter(p => p.New_Budget_Allocation > 0);
   const efficiencyWinners = results.filter(p => p.isEfficiencyWinner);
@@ -271,7 +269,7 @@ export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ results, total
                     <TableCell className="text-right">₹{formatNumber(product['Total Sales - Period 2'])}</TableCell>
                     <TableCell className="text-right">
                       <span className={product.Incremental_Sales > 0 ? 'text-green-600' : 'text-red-600'}>
-                        {product.Incremental_Sales > 0 ? '+' : ''}₹{formatNumber(product.Incremental_Sales)}
+                        ₹{formatNumber(product.Incremental_Sales)}
                       </span>
                     </TableCell>
                     <TableCell className="text-right">₹{formatNumber(product['Total Spend - Period 1'])}</TableCell>

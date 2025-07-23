@@ -187,27 +187,6 @@ const BudgetAllocation = () => {
     URL.revokeObjectURL(url);
   };
 
-  const stats =
-    analysisResults.length > 0
-      ? {
-          totalProducts: analysisResults.length,
-          fundedProducts: analysisResults.filter(
-            (p) => p.New_Budget_Allocation > 0
-          ).length,
-          efficiencyWinners: analysisResults.filter((p) => p.isEfficiencyWinner)
-            .length,
-          totalAllocated: analysisResults.reduce(
-            (sum, p) => sum + p.New_Budget_Allocation,
-            0
-          ),
-          expectedIncrease: analysisResults.reduce(
-            (sum, p) => sum + p.Projected_Sales_Increase,
-            0
-          ),
-        }
-      : null;
-
-  console.log("csvdata2", csvData2, csvData);
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 text-gray-700 flex">
@@ -426,7 +405,7 @@ const BudgetAllocation = () => {
                             <div>
                               <span className="text-gray-500">Total Campaigns: </span>
                               <span className="ml-2 font-medium">
-                                {new Set(csvData2.map(p => p["Campaign Name"])).size}
+                                {new Set(csvData2.map(p => p["Campaign Name"] || p["CampaignName"])).size}
                               </span>
                             </div>
                             <div>
@@ -435,18 +414,17 @@ const BudgetAllocation = () => {
                               </span>
                               <span className="ml-2 font-medium">
                                 ₹
-                                {(
+                                {formatNumber(
                                   csvData2.reduce((sum, p) => {
                                     const revenue = p["Revenue"];
                                     const value =
-                                      revenue !== undefined && revenue !== null
+                                        revenue !== undefined && revenue !== null
                                         ? Number(revenue)
                                         : Number(p["Direct Sales"] || 0) +
                                           Number(p["Indirect Sales"] || 0);
                                     return sum + value;
-                                  }, 0) / 100000
-                                ).toFixed(2)}{" "}
-                                Lakh
+                                  }, 0)
+                                )}{" "}
                               </span>
                             </div>
                           </div>

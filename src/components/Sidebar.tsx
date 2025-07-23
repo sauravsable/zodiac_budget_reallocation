@@ -1,9 +1,8 @@
 import React from "react";
-import { BarChart2, Layout, LogOut } from "lucide-react";
-import { useLocation ,Link} from "react-router-dom";
+import { BarChart2, Layout, Settings, LogOut } from "lucide-react";
+import { useLocation, Link } from "react-router-dom";
 
-const Sidebar = () => {
-
+const Sidebar: React.FC<{}> = () => {
   return (
     <div className="h-screen w-64 bg-gradient-to-b from-blue-100 via-white to-white text-gray-800 flex flex-col p-4 shadow-xl border-r border-gray-200">
       {/* Logo */}
@@ -15,6 +14,7 @@ const Sidebar = () => {
       <div className="flex-1 flex flex-col gap-4">
         <SidebarItem icon={<BarChart2 size={20} />} label="Budget Allocation" />
         <SidebarItem icon={<Layout size={20} />} label="Whitespace Analysis" />
+        <SidebarItem icon={<Settings size={20} />} label="Automation" />
       </div>
 
       {/* Divider + Sticky Logout */}
@@ -35,6 +35,8 @@ const SidebarItem = ({ icon, label }) => {
         return "/";
       case "Whitespace Analysis":
         return "/whitespace-analysis";
+      case "Automation":
+        return "/automation";
       case "Logout":
         return "/logout";
     }
@@ -46,8 +48,9 @@ const SidebarItem = ({ icon, label }) => {
   return (
     <Link to={path} className="no-underline text-inherit">
       <div
-        className={`${isActive ? "bg-blue-200" : ""
-          } flex items-center gap-3 hover:bg-blue-200 px-4 py-3 rounded-lg cursor-pointer transition-all duration-200`}
+        className={`${
+          isActive ? "bg-blue-200" : ""
+        } flex items-center gap-3 hover:bg-blue-200 px-4 py-3 rounded-lg cursor-pointer transition-all duration-200`}
       >
         {icon}
         <span className="text-sm font-medium">{label}</span>

@@ -1,14 +1,5 @@
 import React, { useState, useCallback, useEffect } from "react";
-import {
-  Calculator,
-  BarChart3,
-  Download,
-  AlertCircle,
-  CheckCircle,
-  Currency,
-  Target,
-  Zap,
-} from "lucide-react";
+import { Calculator, BarChart3, Download, AlertCircle, CheckCircle, Currency, Target, Zap } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,7 +11,13 @@ import { BudgetUpload } from "@/components/BudgetUpload";
 import { AnalysisResults } from "@/components/AnalysisResults";
 import { DataPreview } from "@/components/DataPreview";
 import { ExecutiveSummary } from "@/components/ExecutiveSummary";
-import { processCSVData, mergeBudgetDataZepto, mergeBudgetDataBlinkit, processCSVDataBlinkit } from "@/utils/budgetAnalysis";
+import Swal from "sweetalert2";
+import {
+  processCSVData,
+  mergeBudgetDataZepto,
+  mergeBudgetDataBlinkit,
+  processCSVDataBlinkit,
+} from "@/utils/budgetAnalysis";
 import PlatformSwitch from "@/components/PlatformSwitch";
 import { usePlatformStore } from "@/utils/zusStore";
 
@@ -32,14 +29,14 @@ export interface BudgetDataZepto {
 }
 
 export type BudgetDataZeptoReturn = {
-  'Campaign Name': string,
-  'Total Sales - Period 1': number,
-  'Total Spend - Period 1': number,
-  'ROI - Period 1': number,
-  'Total Sales - Period 2': number,
-  'Total Spend - Period 2': number,
-  'ROI - Period 2': number,
-}
+  "Campaign Name": string;
+  "Total Sales - Period 1": number;
+  "Total Spend - Period 1": number;
+  "ROI - Period 1": number;
+  "Total Sales - Period 2": number;
+  "Total Spend - Period 2": number;
+  "ROI - Period 2": number;
+};
 export type BudgetDataBlinkit = {
   "Campaign Name": string;
   "Targeting Value": string;
@@ -48,19 +45,19 @@ export type BudgetDataBlinkit = {
   "Indirect Sales": number;
   "Estimated Budget Consumed": number;
   "Total RoAS": number;
-}
+};
 
 export type BudgetDataBlinkitReturn = {
-  "Campaign Name": string,
-  "Targeting Value": string,
-  "Targeting Type": string,
-  'Total Sales - Period 1': number,
-  'Total Spend - Period 1': number,
-  'ROI - Period 1': number,
-  'Total Sales - Period 2': number,
-  'Total Spend - Period 2': number,
-  'ROI - Period 2': number,
-}
+  "Campaign Name": string;
+  "Targeting Value": string;
+  "Targeting Type": string;
+  "Total Sales - Period 1": number;
+  "Total Spend - Period 1": number;
+  "ROI - Period 1": number;
+  "Total Sales - Period 2": number;
+  "Total Spend - Period 2": number;
+  "ROI - Period 2": number;
+};
 
 type AnalysisResultBase = {
   Incremental_Sales: number;
@@ -94,18 +91,41 @@ const BudgetAllocation = () => {
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string>("");
   const [activeTab, setActiveTab] = useState("upload");
+  const [file, setFile] = useState("");
   const platform = usePlatformStore((state) => state.platform);
 
-  const handleDataUpload = useCallback((data: BudgetDataZepto[]) => {
-    setCsvData(data);
-    setError("");
-  }, []);
+  const handleDataUpload = useCallback(async () => {
+    if (!file) {
+      Swal.fire({
+        title: "Error!",
+        text: "Please select a file first",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
+      return;
+    }
 
-  const handleDataUpload2 = useCallback((data: BudgetDataZepto[]) => {
-    setCsvData2(data);
+    const formData = new FormData();
+    formData.append("file", file); // key name expected by the backend
+
+    try {
+      const response = await fetch("http://localhost:8000/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error(`Upload failed: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      console.log("Upload successful:", data);
+    } catch (err) {
+      console.error("Error uploading file:", err);
+    }
     setisUpload(true);
     setError("");
-  }, []);
+  }, [file]);
 
   const runAnalysis = async () => {
     if (!csvData.length || !totalBudget) {
@@ -192,10 +212,8 @@ const BudgetAllocation = () => {
 
   console.log("csvdata2", csvData2, csvData);
 
-
   return (
     <div className="min-h-screen w-full bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 text-gray-700 flex">
-
       <div className="h-screen">
         {/* Header */}
         <div className=" border-b border-border">
@@ -230,7 +248,12 @@ const BudgetAllocation = () => {
               <div className="flex justify-center">
                 <div className="w-full  space-y-6">
                   <div className="w-1/2 mx-auto">
-                    <BudgetUpload id="file-upload-2" onDataUpload={handleDataUpload2} />
+                    <BudgetUpload id="file-upload-2" setFile={setFile} />
+                  </div>
+                  <div className="w-1/2 mx-auto">
+                    <Button className="w-full bg-blue-300" onClick={handleDataUpload}>
+                      Continue
+                    </Button>
                   </div>
 
                   <div className="text-xs text-gray-400 text-center">
@@ -328,11 +351,6 @@ const BudgetAllocation = () => {
                       <span className="sr-only">Close</span>
                       &times;
                     </button>
-
-                    {/* Upload Component */}
-                    <div className="mb-6">
-                      <BudgetUpload id="file-upload-1" onDataUpload={handleDataUpload} />
-                    </div>
 
                     <div className="bg-white shadow-lg border border-gray-200 rounded-xl p-2 space-y-4">
                       {/* Header */}
@@ -452,7 +470,13 @@ const BudgetAllocation = () => {
               {csvData.length > 0 && (
                 <div className="flex justify-center mt-5">
                   <div className="w-full max-w-6xl">
-                    <DataPreview data={platform === "Blinkit" ? mergeBudgetDataBlinkit(csvData, csvData2) : mergeBudgetDataZepto(csvData, csvData2)} />
+                    <DataPreview
+                      data={
+                        platform === "Blinkit"
+                          ? mergeBudgetDataBlinkit(csvData, csvData2)
+                          : mergeBudgetDataZepto(csvData, csvData2)
+                      }
+                    />
                   </div>
                 </div>
               )}

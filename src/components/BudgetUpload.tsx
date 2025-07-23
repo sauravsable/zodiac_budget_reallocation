@@ -1,82 +1,38 @@
-import React, { useCallback, useMemo } from "react";
-import { Upload, FileText, AlertCircle } from "lucide-react";
+import React, { useCallback } from "react";
+import { Upload, AlertCircle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { BudgetDataZepto } from "@/pages/BudgetAllocation";
 import { usePlatformStore } from "@/utils/zusStore";
-import { parseCSV, parseXLSX } from "../utils/dataParse";
-interface BudgetUploadProps {
-  onDataUpload: (data: BudgetDataZepto[]) => void;
-  id: string;
-}
 
-export const BudgetUpload: React.FC<BudgetUploadProps> = ({
-  onDataUpload,
-  id,
-}) => {
+export const BudgetUpload = ({ id, setFile }) => {
   const [dragActive, setDragActive] = React.useState(false);
   const [selectedFileName, setSelectedFileName] = React.useState("");
   const [error, setError] = React.useState<string>("");
   const [loading, setLoading] = React.useState(false);
   const platform = usePlatformStore((state) => state.platform);
 
-  const { requiredColumns } = useMemo(() => {
-    if (platform === "Blinkit") {
-      return {
-        requiredColumns: [
-          "Campaign Name",
-          "Targeting Value",
-          "Targeting Type",
-          "Direct Sales",
-          "Indirect Sales",
-          "Estimated Budget Consumed",
-        ],
-      };
-    } else if (platform === "Zepto") {
-      return {
-        requiredColumns: ["CampaignName", "Revenue", "Spend"],
-      };
-    } else {
-      return {
-        requiredColumns: [],
-      };
+  const handleFileUpload = useCallback(async (file: File) => {
+    const isCSV = file.type === "text/csv" || file.name.endsWith(".csv");
+    const isXLSX =
+      file.name.endsWith(".xlsx") || file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+
+    if (!isCSV && !isXLSX) {
+      setError("Please upload a CSV or XLSX file");
+      return;
     }
-  }, [platform]);
 
-  const handleFileUpload = useCallback(
-    async (file: File) => {
-      const isCSV = file.type === "text/csv" || file.name.endsWith(".csv");
-      const isXLSX =
-        file.name.endsWith(".xlsx") ||
-        file.type ===
-          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+    setLoading(true);
+    setError("");
 
-      if (!isCSV && !isXLSX) {
-        setError("Please upload a CSV or XLSX file");
-        return;
-      }
-
-      setLoading(true);
-      setError("");
-
-      try {
-        let data: any[] = [];
-        if (isCSV) {
-          const text = await file.text();
-          data = parseCSV(text, requiredColumns);
-        } else if (isXLSX) {
-          data = await parseXLSX(file, requiredColumns);
-        }
-        onDataUpload(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to parse file");
-      } finally {
-        setLoading(false);
-      }
-    },
-    [onDataUpload, requiredColumns]
-  );
+    try {
+      setFile(file);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to read file");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   const handleDrag = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -115,9 +71,7 @@ export const BudgetUpload: React.FC<BudgetUploadProps> = ({
   return (
     <Card
       className={`border border-gray-300 bg-white transition-colors shadow-sm ${
-        dragActive
-          ? "border-blue-300 bg-blue-50"
-          : "hover:border-gray-400 hover:bg-gray-50"
+        dragActive ? "border-blue-300 bg-blue-50" : "hover:border-gray-400 hover:bg-gray-50"
       }`}
     >
       <CardContent className="space-y-4 py-6 px-4">
@@ -136,40 +90,24 @@ export const BudgetUpload: React.FC<BudgetUploadProps> = ({
             onDragOver={handleDrag}
             onDrop={handleDrop}
           >
-            <Upload
-              className={`w-6 h-6 ${
-                dragActive ? "text-blue-500" : "text-gray-500"
-              }`}
-            />
+            <Upload className={`w-6 h-6 ${dragActive ? "text-blue-500" : "text-gray-500"}`} />
 
             {loading ? (
               <div className="w-full">
-                <p className="text-sm text-gray-600 text-center mb-2">
-                  Processing file...
-                </p>
+                <p className="text-sm text-gray-600 text-center mb-2">Processing file...</p>
                 <div className="w-full h-1 bg-gray-200 rounded-full">
                   <div className="h-1 w-1/2 bg-blue-500 rounded-full animate-pulse"></div>
                 </div>
               </div>
             ) : (
               <>
-                <p className="text-sm text-gray-700">
-                  Drag & drop your CSV here
-                </p>
-                <p className="text-xs text-gray-500">
-                  or click below to browse (max 10MB)
-                </p>
+                <p className="text-sm text-gray-700">Drag & drop your CSV or xlsx here</p>
+                <p className="text-xs text-gray-500">or click below to browse (max 10MB)</p>
 
-                <input
-                  type="file"
-                  id={id}
-                  onChange={handleFileInputChange}
-                  className="hidden"
-                />
+                <input type="file" id={id} onChange={handleFileInputChange} className="hidden" />
                 {selectedFileName && (
                   <p className="mt-2 text-sm text-green-600">
-                    Selected:{" "}
-                    <span className="font-medium">{selectedFileName}</span>
+                    Selected: <span className="font-medium">{selectedFileName}</span>
                   </p>
                 )}
                 <Button
@@ -179,7 +117,7 @@ export const BudgetUpload: React.FC<BudgetUploadProps> = ({
                   className="mt-2 border-gray-400 text-gray-800 hover:bg-gray-100"
                 >
                   <label htmlFor={id} className="cursor-pointer">
-                    Choose File
+                    Browse File
                   </label>
                 </Button>
               </>

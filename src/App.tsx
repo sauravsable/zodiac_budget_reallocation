@@ -8,6 +8,7 @@ import BudgetAllocation from "./pages/BudgetAllocation";
 import NotFound from "./pages/NotFound";
 import WhitespaceAnalysis from "./pages/WhitespaceAnalysis";
 import Sidebar from "@/components/Sidebar";
+import Automation from "./pages/Automation";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +25,7 @@ const App = () => {
               <Routes>
                 <Route path="/" element={<BudgetAllocation />} />
                 <Route path="/whitespace-analysis" element={<WhitespaceAnalysis />} />
+                <Route path="/automation" element={<Automation />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </div>

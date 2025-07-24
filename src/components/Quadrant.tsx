@@ -13,12 +13,16 @@ import {
 
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "red", "pink"];
+const getMedian = (arr) => {
+    const total = [...arr].reduce((total, value) => total + value, 0);
+    console.log("Total:", total, "Array Length:", arr.length);
+
+    return total / arr.length;
+};
 
 
 const QuadrantChart = ({ data, name, unit }) => {
-    console.log(data, "QuadrantChart component rendered with data:");
-
-
+    const xMedian = getMedian(data.map((d) => d.x));
     return (
         <div style={{ padding: "10px" }}>
             <h3>Efficiency vs {name} Quadrant</h3>
@@ -34,14 +38,12 @@ const QuadrantChart = ({ data, name, unit }) => {
                     dataKey="x"
                     name={name}
                     unit={unit}
-                    domain={[0, 100]}
                     label={{ value: name, position: "insideBottom", offset: -20, }}
                 />
                 <YAxis
                     type="number"
                     dataKey="y"
                     name="Efficiency"
-                    domain={[0, 100]}
                     label={{ value: "Efficiency", angle: -90, position: "insideLeft", offset: -10 }}
                 />
                 <Tooltip
@@ -70,15 +72,31 @@ const QuadrantChart = ({ data, name, unit }) => {
                     }}
                 />
 
-                <Scatter name="Products" data={data} fill="#8884d8">
-                    {data.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
+                <Scatter name="Products" data={data} shape={(props) => (
+                    <circle
+                        cx={props.cx}
+                        cy={props.cy}
+                        r={6} // radius of dot
+                        fill={props.fill}
+                    />
+                )}>
+                    {data.map((entry, index) => {
+                        const isRight = entry.x >= xMedian;
+                        const isTop = entry.y >= 50;
 
+                        let fillColor;
+                        if (isRight && isTop) fillColor = "#0088FE"; // top-right
+                        else if (!isRight && isTop) fillColor = "#00C49F"; // top-left
+                        else if (!isRight && !isTop) fillColor = "#FFBB28"; // bottom-left
+                        else fillColor = "#FF8042"; // bottom-right
+
+                        return <Cell key={`cell-${index}`} fill={fillColor} />;
+                    })}
                 </Scatter>
+
                 {/* Quadrant lines */}
-                <ReferenceLine x={0} stroke="#000000" />
-                <ReferenceLine y={0} stroke="#000000" />
+                <ReferenceLine x={xMedian} stroke="#000000" />
+                <ReferenceLine y={50} stroke="#000000" />
             </ScatterChart>
         </div>
     );

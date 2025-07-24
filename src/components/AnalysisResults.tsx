@@ -16,6 +16,8 @@ interface AnalysisResultsProps {
 }
 
 export const AnalysisResults: React.FC<AnalysisResultsProps> = ({ results, totalBudget }) => {
+  console.log("Analysis Results:", results);
+  
 
   const fundedProducts = results.filter(p => p.New_Budget_Allocation > 0);
   const efficiencyWinners = results.filter(p => p.isEfficiencyWinner);

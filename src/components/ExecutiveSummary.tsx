@@ -5,6 +5,8 @@ import { Badge } from '@/components/ui/badge';
 import { TrendingUp, Currency, Target, Zap, Trophy, AlertTriangle, CheckCircle } from 'lucide-react';
 import { AnalysisResult } from '@/pages/BudgetAllocation';
 import { formatNumber } from '@/utils/numberFormatter';
+import { GoogleGenAI } from "@google/genai";
+
 interface ExecutiveSummaryProps {
   results: AnalysisResult[];
   totalBudget: number;
@@ -13,9 +15,69 @@ interface ExecutiveSummaryProps {
 export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({ results, totalBudget }) => {
   console.log(results, "ExecutiveSummary component rendered with results:");
 
-  const fundedProducts = results.filter(r => r.New_Budget_Allocation > 0);
+  const fundedProducts = results.filter(r => r.New_Budget_Allocation > 0).sort((a, b) => b.New_Budget_Allocation - a.New_Budget_Allocation);
   const efficiencyWinners = results.filter(r => r.isEfficiencyWinner);
   const topPerformers = fundedProducts.slice(0, 5);
+  const lowPerformers = results.filter(r => r.New_Budget_Allocation === 0)
+  console.log(" Low Performers:", lowPerformers);
+
+  const ai = new GoogleGenAI({
+    apiKey: 'AIzaSyDfeOBCjaDIBPydErtjn2lshSeggot6ju4',
+  });
+
+  React.useEffect(() => {
+    async function main(results: AnalysisResult[]) {
+      const response = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: [
+          {
+            role: "user",
+            parts: [
+              {
+                text: `You are a strategic business analyst.
+
+Review the following business strategy overview and campaign performance data. Provide insights into the effectiveness of the current approach, highlight any inefficiencies or missed opportunities, and suggest strategic refinements.
+
+--- Strategic Overview ---
+
+Efficiency Winners:
+No campaigns have demonstrated improved sales with reduced or stable spend. Despite this, budget has been allocated to maximize ROI through high-performing areas.
+
+Performance-Based Focus:
+A majority of campaigns have been selected for funding based on key performance metrics. The strategy is to concentrate investment where potential is highest.
+
+Portfolio Flexibility:
+A significant portion of the budget remains unallocated, intended for emergency deployment or scaling of high performers as trends emerge.
+
+Current Plan:
+The team plans to execute budget allocation immediately, track campaign performance weekly, review underfunded or unfunded campaigns mid-cycle, and hold back the remaining budget as a contingency.
+
+--- Campaign Data ---
+
+Use the following data to evaluate strategic alignment:
+
+• Identify any signs of emerging efficiency (e.g., increased sales with stable or reduced spend).
+• Evaluate whether the funded campaigns are truly aligned with performance potential.
+• Recommend how to optimize the remaining budget based on observed patterns.
+• Suggest adjustments or enhancements to the current plan if needed.
+
+Campaign Results:
+${JSON.stringify(results, null, 2)}
+`
+              }
+            ]
+          }
+        ]
+      });
+
+      console.log(response.text, " AI Response:");
+    }
+    if (results.length > 0) {
+      main(results);
+    }
+  }, [results]);
+
+
 
   const metrics = {
     fundedCount: fundedProducts.length,
@@ -53,6 +115,8 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({ results, tot
       action: 'Consider expanding top performer budgets if needed'
     }
   ];
+
+
 
   return (
     <div className="space-y-6">
@@ -162,6 +226,44 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({ results, tot
         <CardContent>
           <div className="space-y-4">
             {topPerformers.map((product, index) => (
+              <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-600 rounded-full font-bold">
+                    {index + 1}
+                  </div>
+                  <div>
+                    <div className="font-medium flex items-center gap-2">
+                      {product['Campaign Name']}
+                      {product.isEfficiencyWinner && (
+                        <Badge className="bg-orange-100 text-orange-800">
+                          <Zap className="h-3 w-3 mr-1" />
+                          Efficiency Winner
+                        </Badge>
+                      )}
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      Ranking Score: {product.Ranking_Score.toFixed(3)} |
+                      Sales Change: {product.Incremental_Sales > 0 ? '+' : ''}{formatNumber(product.Incremental_Sales)}
+                    </div>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="font-bold text-green-600">₹{formatNumber(product.New_Budget_Allocation)}</div>
+                  <div className="text-sm text-gray-500">{product.Budget_Multiplier.toFixed(1)}x multiplier</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>Low 5 Investment Priorities</CardTitle>
+          <CardDescription>Highest-ranking campaigns receiving budget allocation</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {lowPerformers.map((product, index) => (
               <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                 <div className="flex items-center gap-4">
                   <div className="flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-600 rounded-full font-bold">

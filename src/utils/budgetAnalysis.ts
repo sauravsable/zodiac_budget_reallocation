@@ -247,6 +247,8 @@ export function processCSVDataBlinkit(data: BudgetDataBlinkitReturn[], totalBudg
     // Combined efficiency score
     const efficiencyScore = (0.4 * currentROI) + (0.6 * incrementalROIScore);
 
+    
+
     return {
       ...product,
       Incremental_Sales: incrementalSales,
@@ -312,9 +314,14 @@ export function processCSVDataBlinkit(data: BudgetDataBlinkitReturn[], totalBudg
       maxAllocation = Math.min(currentSpend * 3, remainingBudget);
     } else if (product.Ranking_Score > 0.8) {
       maxAllocation = Math.min(currentSpend * 2.5, remainingBudget);
-    } else if (product.Ranking_Score > 0.5) {
+    } 
+    else if (product.Ranking_Score > 0.5) {
       maxAllocation = Math.min(currentSpend * 2, remainingBudget);
-    } else {
+    } 
+    // else if (product.Ranking_Score == 0) {
+    //   maxAllocation = 0;
+    // } 
+    else {
       maxAllocation = Math.min(currentSpend * 1.5, remainingBudget);
     }
 

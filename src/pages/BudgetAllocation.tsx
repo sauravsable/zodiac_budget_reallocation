@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback } from "react";
 import {
   Calculator,
   BarChart3,
@@ -26,41 +26,31 @@ import { BudgetUpload } from "@/components/BudgetUpload";
 import { AnalysisResults } from "@/components/AnalysisResults";
 import { DataPreview } from "@/components/DataPreview";
 import { ExecutiveSummary } from "@/components/ExecutiveSummary";
-import {
-  processCSVData,
-  mergeBudgetDataZepto,
-  mergeBudgetDataBlinkit,
-  processCSVDataBlinkit,
-} from "@/utils/budgetAnalysis";
+import { processCSVData, mergeBudgetData } from "@/utils/budgetAnalysis";
 import PlatformSwitch from "@/components/PlatformSwitch";
 import { usePlatformStore } from "@/utils/zusStore";
 import { formatNumber } from "@/utils/numberFormatter";
-export interface BudgetDataZepto {
+
+export type BudgetDataZepto = {
   CampaignName: string;
   Revenue: number;
   Spend: number;
-  Roas: number;
-}
-
-export type BudgetDataZeptoReturn = {
-  "Campaign Name": string;
-  "Total Sales - Period 1": number;
-  "Total Spend - Period 1": number;
-  "Total Sales - Period 2": number;
-  "Total Spend - Period 2": number;
 };
 
 export type BudgetDataBlinkit = {
   "Campaign Name": string;
-  "Targeting Value": string;
-  "Targeting Type": string;
   "Direct Sales": number;
   "Indirect Sales": number;
   "Estimated Budget Consumed": number;
-  "Total RoAS": number;
 };
 
-export type BudgetDataBlinkitReturn = {
+export type BudgetDataInstamart = {
+  Campaign_Name: string;
+  TOTAL_GMV: number;
+  TOTAL_BUDGET_BURNT: number;
+};
+
+export type BudgetDataReturn = {
   "Campaign Name": string;
   "Total Sales - Period 1": number;
   "Total Spend - Period 1": number;
@@ -84,12 +74,7 @@ type AnalysisResultBase = {
   isEfficiencyWinner: boolean;
 };
 
-export type AnalysisResultZepto = BudgetDataZeptoReturn & AnalysisResultBase;
-
-export type AnalysisResultBlinkit = BudgetDataBlinkitReturn &
-  AnalysisResultBase;
-
-export type AnalysisResult = AnalysisResultZepto | AnalysisResultBlinkit;
+export type AnalysisResult = BudgetDataReturn & AnalysisResultBase;
 
 const BudgetAllocation = () => {
   const [csvData, setCsvData] = useState([]);
@@ -145,15 +130,28 @@ const BudgetAllocation = () => {
         await new Promise((resolve) => setTimeout(resolve, 300));
       }
       let mergedresult;
-      let results;
       if (platform === "Blinkit") {
-        mergedresult = mergeBudgetDataBlinkit(csvData, csvData2);
-        results = processCSVDataBlinkit(mergedresult, budget);
+        mergedresult = mergeBudgetData(csvData, csvData2, {
+          campaignField: "Campaign Name",
+          salesField: ["Direct Sales", "Indirect Sales"],
+          spendField: "Estimated Budget Consumed",
+        });
       }
       if (platform === "Zepto") {
-        mergedresult = mergeBudgetDataZepto(csvData, csvData2);
-        results = processCSVData(mergedresult, budget);
+        mergedresult = mergeBudgetData(csvData, csvData2, {
+          campaignField: "CampaignName",
+          salesField: "Revenue",
+          spendField: "Spend",
+        });
       }
+      if (platform === "Instamart") {
+        mergedresult = mergeBudgetData(csvData, csvData2, {
+          campaignField: "CAMPAIGN_NAME",
+          salesField: "TOTAL_GMV",
+          spendField: "TOTAL_BUDGET_BURNT",
+        });
+      }
+      const results = processCSVData(mergedresult, budget);
       setAnalysisResults(results);
       setActiveTab("results");
     } catch (err) {
@@ -163,7 +161,7 @@ const BudgetAllocation = () => {
       setProgress(0);
     }
   };
-
+  
   const exportResults = () => {
     if (!analysisResults.length) return;
 
@@ -186,7 +184,6 @@ const BudgetAllocation = () => {
     a.click();
     URL.revokeObjectURL(url);
   };
-
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 text-gray-700 flex">
@@ -403,9 +400,20 @@ const BudgetAllocation = () => {
                           </h4>
                           <div className="grid grid-cols-2 gap-4 text-sm text-gray-700">
                             <div>
-                              <span className="text-gray-500">Total Campaigns: </span>
+                              <span className="text-gray-500">
+                                Total Campaigns:{" "}
+                              </span>
                               <span className="ml-2 font-medium">
-                                {new Set(csvData2.map(p => p["Campaign Name"] || p["CampaignName"])).size}
+                                {
+                                  new Set(
+                                    csvData2.map(
+                                      (p) =>
+                                        p["Campaign Name"] ||
+                                        p["CampaignName"] ||
+                                        p["CAMPAIGN_NAME"]
+                                    )
+                                  ).size
+                                }
                               </span>
                             </div>
                             <div>
@@ -416,13 +424,14 @@ const BudgetAllocation = () => {
                                 ₹
                                 {formatNumber(
                                   csvData2.reduce((sum, p) => {
-                                    const revenue = p["Revenue"];
-                                    const value =
-                                        revenue !== undefined && revenue !== null
-                                        ? Number(revenue)
-                                        : Number(p["Direct Sales"] || 0) +
-                                          Number(p["Indirect Sales"] || 0);
-                                    return sum + value;
+                                    const revenueRaw =
+                                      p["Revenue"] ??
+                                      p["TOTAL_GMV"] ??
+                                      Number(p["Direct Sales"] || 0) +
+                                        Number(p["Indirect Sales"] || 0);
+
+                                    const revenue = Number(revenueRaw);
+                                    return sum + revenue;
                                   }, 0)
                                 )}{" "}
                               </span>
@@ -500,8 +509,12 @@ const BudgetAllocation = () => {
                     <DataPreview
                       data={
                         platform === "Blinkit"
-                          ? mergeBudgetDataBlinkit(csvData, csvData2)
-                          : mergeBudgetDataZepto(csvData, csvData2)
+                          ? mergeBudgetData(csvData, csvData2, {campaignField: "Campaign Name",salesField: ["Direct Sales", "Indirect Sales"],spendField: "Estimated Budget Consumed"})
+                          : platform === "Zepto"
+                          ? mergeBudgetData(csvData, csvData2, { campaignField: "CampaignName", salesField: "Revenue", spendField: "Spend"})
+                          : platform === "Instamart"
+                          ? mergeBudgetData(csvData, csvData2, { campaignField: "CAMPAIGN_NAME",salesField: "TOTAL_GMV",spendField: "TOTAL_BUDGET_BURNT",})
+                          : []
                       }
                     />
                   </div>

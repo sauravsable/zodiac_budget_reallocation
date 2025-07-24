@@ -17,7 +17,7 @@ const PlatformSwitch = () => {
     {
       label: "Instamart",
       bgClass: "bg-orange-600",
-      disabled: true,
+      disabled: false,
     },
   ];
 

@@ -5,11 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { BudgetDataZepto } from "@/pages/BudgetAllocation";
 import { usePlatformStore } from "@/utils/zusStore";
-import { parseCSV, parseXLSX, parseMultipleCSVSheetsSelected, parseXLSXSelectedSheets } from "../utils/dataParse";
+import { parseCSV, parseXLSX } from "../utils/dataParse";
 interface BudgetUploadProps {
   onDataUpload: (data: BudgetDataZepto[]) => void;
   id: string;
 }
+
+const requiredSheets = ["PRODUCT_LISTING", "PRODUCT_RECOMMENDATION"];
+const numericColumns = ["Spend", "Revenue", "TOTAL_GMV", "Direct Sales", "Indirect Sales", "Estimated Budget Consumed"];
 
 export const BudgetUpload: React.FC<BudgetUploadProps> = ({
   onDataUpload,
@@ -35,13 +38,16 @@ export const BudgetUpload: React.FC<BudgetUploadProps> = ({
       return {
         requiredColumns: ["CampaignName", "Revenue", "Spend"],
       };
+    } else if (platform === "Instamart") {
+      return {
+        requiredColumns: ["CAMPAIGN_NAME", "TOTAL_GMV", "TOTAL_BUDGET_BURNT"],
+      };
     } else {
       return {
         requiredColumns: [],
       };
     }
   }, [platform]);
-  
 
   const handleFileUpload = useCallback(
     async (file: File) => {
@@ -62,21 +68,10 @@ export const BudgetUpload: React.FC<BudgetUploadProps> = ({
       try {
         let data: any[] = [];
         if (isCSV) {
-          // const text = await file.text();
-          // data = parseCSV(text, requiredColumns);
           const content = await file.text();
-          data = parseMultipleCSVSheetsSelected(
-          [{ filename: file.name, content }],
-          requiredColumns,
-          ["PRODUCT_LISTING", "PRODUCT_RECOMMENDATION"]
-        );
+          data = parseCSV([{ filename: file.name, content }], requiredColumns, requiredSheets, numericColumns);
         } else if (isXLSX) {
-          // data = await parseXLSX(file, requiredColumns);
-          data = await parseXLSXSelectedSheets(
-          file,
-          requiredColumns,
-          ["PRODUCT_LISTING", "PRODUCT_RECOMMENDATION"]
-        );
+          data = await parseXLSX(file, requiredColumns, requiredSheets, numericColumns);
         }
         onDataUpload(data);
       } catch (err) {

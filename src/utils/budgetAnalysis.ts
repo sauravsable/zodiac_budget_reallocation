@@ -80,6 +80,10 @@ export function processCSVData(data: BudgetDataReturn[], totalBudgetLakhs: numbe
 
     // Combined efficiency score
     const efficiencyScore = (0.4 * currentROI) + (0.6 * incrementalROIScore);
+    const growth = product['Total Sales - Period 1'] > 0 ? incrementalSales / product['Total Sales - Period 1'] : 0;
+    const score = (0.5 * efficiencyScore) + (0.5 * growth);
+    console.log(score, "score");
+
 
     return {
       ...product,
@@ -89,20 +93,22 @@ export function processCSVData(data: BudgetDataReturn[], totalBudgetLakhs: numbe
       Incremental_ROI_Score: Number(incrementalROIScore.toFixed(2)),
       Current_ROI: Number(currentROI.toFixed(2)),
       Efficiency_Score: Number(efficiencyScore.toFixed(2)),
+      Score: Number(score.toFixed(2)),
       isEfficiencyWinner: incrementalSales > 0 && incrementalSpend <= 0
     };
   });
 
   // Normalize scores for ranking
-  const maxEfficiency = Math.max(...processedData.map(p => p.Efficiency_Score));
+  const maxEfficiency = Math.max(...processedData.map(p => p.Score));
   const maxIncrementalROI = Math.max(...processedData.map(p => p.Incremental_ROI_Score));
 
   const rankedData = processedData.map(product => {
-    const normEfficiency = maxEfficiency > 0 ? product.Efficiency_Score / maxEfficiency : 0;
-    const normIncrementalROI = maxIncrementalROI > 0 ? product.Incremental_ROI_Score / maxIncrementalROI : 0;
+    const normEfficiency = maxEfficiency > 0 ? product.Score / maxEfficiency : 0;
+    // const normIncrementalROI = maxIncrementalROI > 0 ? product.Incremental_ROI_Score / maxIncrementalROI : 0;
 
     // Final ranking score with improvement bonus
-    let rankingScore = (0.3 * normEfficiency) + (0.7 * normIncrementalROI);
+    let rankingScore = Math.abs(normEfficiency);
+
 
     // Add bonus for efficiency winners
     if (product.isEfficiencyWinner) {
@@ -120,7 +126,7 @@ export function processCSVData(data: BudgetDataReturn[], totalBudgetLakhs: numbe
     };
   });
 
-   // Sort by ranking score
+  // Sort by ranking score
   const sortedData = rankedData.sort((a, b) => {
     // if (b.Ranking_Score !== a.Ranking_Score) {
     //   return b.Ranking_Score - a.Ranking_Score;
@@ -146,13 +152,13 @@ export function processCSVData(data: BudgetDataReturn[], totalBudgetLakhs: numbe
       maxAllocation = Math.min(currentSpend * 3, remainingBudget);
     } else if (product.Ranking_Score > 0.8) {
       maxAllocation = Math.min(currentSpend * 2.5, remainingBudget);
-    } 
+    }
     else if (product.Ranking_Score > 0.5) {
       maxAllocation = Math.min(currentSpend * 2, remainingBudget);
-    } 
-    // else if (product.Ranking_Score == 0) {
-    //   maxAllocation = 0;
-    // } 
+    }
+    else if (product.Incremental_Sales < 0 && product.Incremental_Spend > 0) {
+      maxAllocation = 0;
+    }
     else {
       maxAllocation = Math.min(currentSpend * 1.5, remainingBudget);
     }

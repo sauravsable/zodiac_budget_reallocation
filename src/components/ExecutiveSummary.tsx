@@ -87,8 +87,9 @@ ${JSON.stringify(results, null, 2)}
     totalAllocated: fundedProducts.reduce((sum, r) => sum + r.New_Budget_Allocation, 0),
     budgetUtilization: (fundedProducts.reduce((sum, r) => sum + r.New_Budget_Allocation, 0) / totalBudget) * 100,
     expectedIncrease: fundedProducts.reduce((sum, r) => sum + r.Projected_Sales_Increase, 0),
-    portfolioROI: fundedProducts.reduce((sum, r) => sum + r.Projected_Sales_Increase, 0) /
-      fundedProducts.reduce((sum, r) => sum + r.New_Budget_Allocation, 0),
+    portfolioROI: (fundedProducts.reduce((sum, r) => sum + r['Total Sales - Period 2'], 0) /
+      fundedProducts.reduce((sum, r) => sum + r['Total Spend - Period 2'], 0))/(fundedProducts.reduce((sum, r) => sum + r['Total Sales - Period 1'], 0) /
+      fundedProducts.reduce((sum, r) => sum + r['Total Spend - Period 1'], 0)),
     avgMultiplier: fundedProducts.reduce((sum, r) => sum + r.Budget_Multiplier, 0) / fundedProducts.length
   };
 

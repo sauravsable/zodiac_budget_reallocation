@@ -378,7 +378,7 @@ const BudgetAllocation = () => {
                           <Input
                             id="budget"
                             type="number"
-                            placeholder="e.g., 10.5"
+                            placeholder="e.g., 10 Lakhs"
                             value={totalBudget}
                             onChange={(e) => setTotalBudget(e.target.value)}
                             className="pl-6"

@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { TrendingUp, Currency, Target, Zap, Trophy, AlertTriangle, CheckCircle } from 'lucide-react';
@@ -13,6 +13,7 @@ interface ExecutiveSummaryProps {
 }
 
 export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({ results, totalBudget }) => {
+  const [aiResponse, setaiResponse] = useState('')
   console.log(results, "ExecutiveSummary component rendered with results:");
 
   const fundedProducts = results.filter(r => r.New_Budget_Allocation > 0).sort((a, b) => b.New_Budget_Allocation - a.New_Budget_Allocation);
@@ -25,6 +26,7 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({ results, tot
     apiKey: 'AIzaSyDfeOBCjaDIBPydErtjn2lshSeggot6ju4',
   });
 
+
   React.useEffect(() => {
     async function main(results: AnalysisResult[]) {
       const response = await ai.models.generateContent({
@@ -34,9 +36,9 @@ export const ExecutiveSummary: React.FC<ExecutiveSummaryProps> = ({ results, tot
             role: "user",
             parts: [
               {
-                text: `You are a strategic business analyst.
+                text: `You are a quick commerce ads specialist.
 
-Review the following business strategy overview and campaign performance data. Provide insights into the effectiveness of the current approach, highlight any inefficiencies or missed opportunities, and suggest strategic refinements.
+Review the following campaign performance data. Provide insights into the effectiveness of the current approach, highlight any inefficiencies or missed opportunities, and suggest strategic refinements.
 
 --- Strategic Overview ---
 
@@ -60,22 +62,42 @@ Use the following data to evaluate strategic alignment:
 • Evaluate whether the funded campaigns are truly aligned with performance potential.
 • Recommend how to optimize the remaining budget based on observed patterns.
 • Suggest adjustments or enhancements to the current plan if needed.
+	
+Give 1-2 pointers for strategyAlignment, budgetOpportunities, efficiencyInsights, refinedRecommendations.
 
 Campaign Results:
 ${JSON.stringify(results, null, 2)}
+
+--- Expected Output Format (in json) —
+{
+  "efficiencyInsights": "Brief insight about any efficiency winners or lack thereof.",
+  "strategyAlignment": "Assessment of whether selected campaigns align with performance.",
+  "budgetOpportunities": "Suggestions for using the unallocated budget.",
+  "refinedRecommendations": [
+    "Suggested strategic changes or reinforcements, based on data.",
+    "Can include monitoring, reallocation, pausing campaigns, etc."
+  ]
+}
 `
               }
             ]
           }
         ]
       });
-
-      console.log(response.text, " AI Response:");
+      console.log(response.text);
+      if (response.text) {
+        setaiResponse(response.text);
+      }
     }
     if (results.length > 0) {
       main(results);
     }
   }, [results]);
+
+
+
+
+
 
 
 
@@ -88,34 +110,55 @@ ${JSON.stringify(results, null, 2)}
     budgetUtilization: (fundedProducts.reduce((sum, r) => sum + r.New_Budget_Allocation, 0) / totalBudget) * 100,
     expectedIncrease: fundedProducts.reduce((sum, r) => sum + r.Projected_Sales_Increase, 0),
     portfolioROI: (fundedProducts.reduce((sum, r) => sum + r['Total Sales - Period 2'], 0) /
-      fundedProducts.reduce((sum, r) => sum + r['Total Spend - Period 2'], 0))/(fundedProducts.reduce((sum, r) => sum + r['Total Sales - Period 1'], 0) /
-      fundedProducts.reduce((sum, r) => sum + r['Total Spend - Period 1'], 0)),
+      fundedProducts.reduce((sum, r) => sum + r['Total Spend - Period 2'], 0)) / (fundedProducts.reduce((sum, r) => sum + r['Total Sales - Period 1'], 0) /
+        fundedProducts.reduce((sum, r) => sum + r['Total Spend - Period 1'], 0)),
     avgMultiplier: fundedProducts.reduce((sum, r) => sum + r.Budget_Multiplier, 0) / fundedProducts.length
   };
 
-  const recommendations = [
-    {
-      type: 'success',
-      icon: CheckCircle,
-      title: 'Efficiency Winners Identified',
-      description: `${metrics.efficiencyWinnersCount} campaigns show improved sales with reduced/maintained spend`,
-      action: 'Priority funding allocated to maximize ROI'
-    },
-    {
-      type: 'info',
-      icon: Target,
-      title: 'Strategic Focus',
-      description: `${metrics.fundingRate.toFixed(1)}% of campaigns selected for funding based on performance metrics`,
-      action: 'Concentrate resources on high-potential campaigns'
-    },
-    {
-      type: 'warning',
-      icon: AlertTriangle,
-      title: 'Portfolio Diversification',
-      description: `${(100 - metrics.budgetUtilization).toFixed(1)}% budget remaining for emergency allocation`,
-      action: 'Consider expanding top performer budgets if needed'
+  const recommendations = []
+  if (aiResponse) {
+    try {
+      const jsonStart = aiResponse.indexOf('{');
+      const jsonEnd = aiResponse.lastIndexOf('}');
+      const jsonString = aiResponse.substring(jsonStart, jsonEnd + 1);
+      const parsedResponse = JSON.parse(jsonString);
+
+      recommendations.push(
+        { title: "Efficiency Insights", description: parsedResponse.efficiencyInsights, icon: Zap, type: 'info' },
+        { title: "Strategy Alignment", description: parsedResponse.strategyAlignment, icon: Target, type: 'info' },
+        { title: "Budget Opportunities", description: parsedResponse.budgetOpportunities, icon: Currency, type: 'info' },
+      );
+    } catch (error) {
+      console.error("Error parsing AI response:", error);
     }
-  ];
+  }
+
+  const nextSteps = [];
+  if (aiResponse) {
+    try {
+      const jsonStart = aiResponse.indexOf('{');
+      const jsonEnd = aiResponse.lastIndexOf('}');
+      const jsonString = aiResponse.substring(jsonStart, jsonEnd + 1);
+      const parsedResponse = JSON.parse(jsonString);
+
+      if (Array.isArray(parsedResponse.refinedRecommendations)) {
+        parsedResponse.refinedRecommendations.forEach(rec => {
+          // 🔐 Force to string in case rec is an object
+          nextSteps.push({
+            title: typeof rec === "string" ? rec : JSON.stringify(rec),
+            description: "",
+            icon: CheckCircle,
+            type: 'success'
+          });
+        });
+      }
+    } catch (error) {
+      console.error("Error parsing AI response:", error);
+    }
+  }
+
+
+
 
 
 
@@ -304,55 +347,68 @@ ${JSON.stringify(results, null, 2)}
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {recommendations.map((rec, index) => {
-              const IconComponent = rec.icon;
-              const colorClass = rec.type === 'success' ? 'text-green-600 bg-green-50' :
-                rec.type === 'warning' ? 'text-orange-600 bg-orange-50' :
-                  'text-blue-600 bg-blue-50';
-
-              return (
-                <div key={index} className="flex items-start gap-4 p-4 rounded-lg border">
-                  <div className={`p-2 rounded-lg ${colorClass}`}>
-                    <IconComponent className="h-5 w-5" />
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="font-medium text-gray-900">{rec.title}</h4>
-                    <p className="text-sm text-gray-600 mt-1">{rec.description}</p>
-                    <p className="text-sm font-medium text-blue-600 mt-2">{rec.action}</p>
-                  </div>
+            {
+              recommendations.length === 0 && !aiResponse ? (
+                <div className="animate-pulse space-y-4">
+                  <div className="h-6 bg-gray-200 rounded w-3/4"></div>
+                  <div className="h-6 bg-gray-200 rounded w-1/2"></div>
+                  <div className="h-6 bg-gray-200 rounded w-full"></div>
                 </div>
-              );
-            })}
+              ) :
+                recommendations.map((rec, index) => {
+                  const IconComponent = rec.icon;
+                  const colorClass = rec.type === 'success' ? 'text-green-600 bg-green-50' :
+                    rec.type === 'warning' ? 'text-orange-600 bg-orange-50' :
+                      'text-blue-600 bg-blue-50';
+
+                  return (
+                    <div key={index} className="flex items-start gap-4 p-4 rounded-lg border">
+                      <div className={`p-2 rounded-lg ${colorClass}`}>
+                        <IconComponent className="h-5 w-5" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-medium text-gray-900">{rec.title}</h4>
+                        <p className="text-sm text-gray-600 mt-1">{rec.description}</p>
+                        <p className="text-sm font-medium text-blue-600 mt-2">{rec.action}</p>
+                      </div>
+                    </div>
+                  );
+                })}
           </div>
         </CardContent>
       </Card>
 
       {/* Next Steps */}
-      <Card className="bg-gradient-to-r from-indigo-50 to-purple-50">
+      <Card className="bg-gradient-to-r mb-10 from-indigo-50 to-purple-50">
         <CardHeader>
           <CardTitle>Recommended Next Steps</CardTitle>
         </CardHeader>
         <CardContent>
+
           <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
-              <span className="text-sm">Implement budget allocation for top {metrics.efficiencyWinnersFunded} efficiency winners immediately</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
-              <span className="text-sm">Monitor performance of funded campaigns weekly for first month</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
-              <span className="text-sm">Review unfunded campaigns for potential mid-cycle additions</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
-              <span className="text-sm">Prepare contingency plan for remaining ₹{(formatNumber(totalBudget - metrics.totalAllocated))} budget</span>
-            </div>
+
+            {//add skeleton loading if no next steps
+              nextSteps.length === 0 && !aiResponse ? (
+                <div className="animate-pulse space-y-4">
+                  <div className="h-6 bg-gray-200 rounded w-3/4"></div>
+                  <div className="h-6 bg-gray-200 rounded w-1/2"></div>
+                  <div className="h-6 bg-gray-200 rounded w-full"></div>
+                </div>
+              ) :
+                nextSteps.map((step, index) => (
+                  <div key={index} className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-indigo-500 rounded-full"></div>
+                    <span className="text-sm font-medium">
+                      {typeof step.title === 'string' ? step.title : '[Invalid title]'}
+                    </span>
+                  </div>
+                ))}
           </div>
         </CardContent>
       </Card>
+
     </div>
   );
 };
+
+

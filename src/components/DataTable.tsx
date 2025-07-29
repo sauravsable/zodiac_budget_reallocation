@@ -1,44 +1,98 @@
-import React from "react";
-import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell, TableCaption } from "@/components/ui/table"; // adjust path as necessary
+import React, { useState } from "react";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableHead,
+  TableRow,
+  TableCell,
+} from "@/components/ui/table"; // adjust the path as necessary
 
-const headers = [
-  { id: "id", name: "ID" },
-  { id: "name", name: "Name" },
-  { id: "email", name: "Email" },
-  { id: "role", name: "Role" },
-];
-const data = [
-  { id: 1, name: "Alice", email: "alice@example.com", role: "Admin" },
-  { id: 2, name: "Bob", email: "bob@example.com", role: "Editor" },
-  { id: 3, name: "Charlie", email: "charlie@example.com", role: "Viewer" },
-];
+const DataTable = ({ tablename, data = [] }) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const rowsPerPage = 7;
+  const tableHeader = tablename === 'Low Competition Market' ? ['Keyword', 'City', 'Competitors', 'With Ads'] : ['Keyword', 'City', 'Org rank', 'Ad rank', 'Rank Diff'];
 
-const DataTable = () => {
+  const totalPages = Math.ceil(data.length / rowsPerPage);
+  const startIndex = (currentPage - 1) + rowsPerPage;
+  const currentData = data.slice(startIndex , startIndex + rowsPerPage);
+
+  const goToPage = (page) => {
+    if (page < 1 || page > totalPages) return;
+    setCurrentPage(page);
+  };
+
   return (
     <div className="space-y-4 w-full">
-      <h2 className="text-xl font-semibold">User List</h2>
+      <h2 className="text-xl text-center mt-2 font-semibold">{tablename}</h2>
+
       <Table className="border border-border bg-white">
-        {/* <TableCaption>A list of all users and their roles.</TableCaption> */}
         <TableHeader>
           <TableRow>
-            <TableHead>ID</TableHead>
-            <TableHead>Name</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Role</TableHead>
+            {
+              tableHeader.map((header, index) => (
+                <TableHead key={index} className="text-left">
+                  {header}
+                </TableHead>
+              ))
+            }
           </TableRow>
         </TableHeader>
         <TableBody>
-          {data.map((user) => (
-            <TableRow key={user.id}>
-              <TableCell>{user.id}</TableCell>
-              <TableCell>{user.name}</TableCell>
-              <TableCell>{user.email}</TableCell>
-              <TableCell>{user.role}</TableCell>
+          {currentData.length > 0 ? (
+            currentData.map((user) => (
+              <TableRow key={user.keywordid} className="hover:bg-gray-50">
+                <TableCell>{user.keywordid}</TableCell>
+                <TableCell>{user.cityname}</TableCell>
+                {tablename === 'Low Competition Market' ? (
+                  <>
+                    <TableCell>{user.total_count}</TableCell>
+                    <TableCell>{user.competator_count}</TableCell>
+                  </>
+
+                ) : (
+                  <>
+                    <TableCell>{user.org_rank}</TableCell>
+                    <TableCell>{user.ad_rank}</TableCell>
+                    <TableCell>{user.rank_difference}</TableCell>
+                  </>
+                )}
+
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={4} className="text-center">
+                No data available
+              </TableCell>
             </TableRow>
-          ))}
+          )}
         </TableBody>
       </Table>
-    </div>
+
+      {/* Pagination Controls */}
+      <div className="flex justify-between items-center mt-2">
+        <button
+          onClick={() => goToPage(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+        >
+          Previous
+        </button>
+
+        <div className="text-sm text-gray-700">
+          Page {currentPage} of {totalPages}
+        </div>
+
+        <button
+          onClick={() => goToPage(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+        >
+          Next
+        </button>
+      </div>
+    </div >
   );
 };
 

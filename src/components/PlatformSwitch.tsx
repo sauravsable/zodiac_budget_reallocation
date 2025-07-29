@@ -39,7 +39,7 @@ const PlatformSwitch = () => {
                   }
                 }}
                 onKeyPress={(e) => e.key === "Enter" && !disabled && setPlatform(label)}
-                className={`px-4 py-1.5 text-sm font-medium border transition-all duration-200 rounded-md
+                className={`px-4 py-1.5 text-sm w-[6rem] text-center font-medium border transition-all duration-200 rounded-md
                     ${isSelected
                       ? `${bgClass} text-white border-transparent`
                       : "bg-slate-800 text-white border border-white/20 hover:border-white/40 hover:bg-slate-700"

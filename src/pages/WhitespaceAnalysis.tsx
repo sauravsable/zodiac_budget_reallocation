@@ -1,6 +1,4 @@
-import React, { useState } from "react";
-import * as Select from "@radix-ui/react-select";
-import { ChevronDown } from "lucide-react";
+import { useState } from "react";
 import BrandSelect from "@/components/BrandSelect";
 import DataTable from "@/components/DataTable";
 import PlatformSwitch from "@/components/PlatformSwitch";
@@ -11,6 +9,8 @@ import { allParamsDefined, api, QueryKeys } from "@/utils/api";
 import { usePlatformStore } from "@/utils/zusStore";
 
 const WhitespaceAnalysis = () => {
+  const platform = usePlatformStore((state) => state.platform);
+
   const [selectedBrand, setSelectedBrand] = useState("");
   const [selectedDate, setSelectedDate] = useState(null);
   const [getData, setGetData] = useState(false)
@@ -18,7 +18,7 @@ const WhitespaceAnalysis = () => {
   const params1 = {
     date: selectedDate ? selectedDate.toISOString().split("T")[0] : "",
     brandName: selectedBrand,
-    platformId: usePlatformStore.getState().platform,
+    platformId: platform.toLowerCase()
   };
   const { data: adEffectiveness, isLoading, } = useQuery({
     queryKey: [QueryKeys.adEffectiveness, params1],
@@ -32,8 +32,6 @@ const WhitespaceAnalysis = () => {
     select: (data) => data.data,
     enabled: allParamsDefined(params1) && getData,
   });
-
-  console.log("adEffectiveness", adEffectiveness, "lowCompetition", lowCompetition);
 
   if (isLoading || isloading2) {
     return (

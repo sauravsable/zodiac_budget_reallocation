@@ -40,8 +40,8 @@ const DataTable = ({ tablename, data = [] }) => {
         </TableHeader>
         <TableBody>
           {currentData.length > 0 ? (
-            currentData.map((user) => (
-              <TableRow key={user.keywordid} className="hover:bg-gray-50">
+            currentData.map((user, index) => (
+              <TableRow key={index} className="hover:bg-gray-50">
                 <TableCell>{user.keywordid}</TableCell>
                 <TableCell>{user.cityname}</TableCell>
                 {tablename === 'Low Competition Market' ? (

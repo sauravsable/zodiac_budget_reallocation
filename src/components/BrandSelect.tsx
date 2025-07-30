@@ -1,39 +1,42 @@
 import React, { useState, useMemo } from "react";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select";
+import * as Popover from "@radix-ui/react-popover";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { allParamsDefined, api, QueryKeys } from "@/utils/api";
-import { usePlatformStore } from "@/utils/zusStore";
+import { useBrandStore, usePlatformStore } from "@/utils/zusStore";
 import { FixedSizeList as List } from "react-window";
 
-const ITEM_HEIGHT = 36; // px
+const ITEM_HEIGHT = 36;
 const VISIBLE_COUNT = 8;
 
-const BrandSelect = ({ selectedBrand, setSelectedBrand }) => {
+export default function BrandSelect() {
   const platform = usePlatformStore((state) => state.platform);
-
-  const { data: brands, isLoading: brandLoading } = useQuery({
-    queryKey: [QueryKeys.lowCompetitionMarket, { platformId: platform.toLowerCase() }],
+  const setSelectedBrand = useBrandStore((state) => state.setSelectedBrand);
+  const selectedBrand= useBrandStore((state) => state.selectedBrand);
+  const { data: brands, isLoading } = useQuery({
+    queryKey: [
+      QueryKeys.lowCompetitionMarket,
+      { platformId: platform.toLowerCase() },
+    ],
     queryFn: ({ signal }) =>
-      api.whiteSpaceAnalysis.brandList({ platformId: platform.toLowerCase() }, signal),
+      api.whiteSpaceAnalysis.brandList(
+        { platformId: platform.toLowerCase() },
+        signal
+      ),
     select: (data) => data.data,
-    enabled: allParamsDefined({
-      platformId: platform.toLowerCase(),
-    }),
+    enabled: allParamsDefined({ platformId: platform.toLowerCase() }),
   });
 
+  const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
 
   const filteredBrands = useMemo(
     () =>
       brands
-        ?.filter((brand) => brand.toLowerCase().includes(search.toLowerCase()))
+        ?.filter((brand) =>
+          brand.toLowerCase().includes(search.toLowerCase())
+        )
         .sort() ?? [],
     [brands, search]
   );
@@ -41,40 +44,42 @@ const BrandSelect = ({ selectedBrand, setSelectedBrand }) => {
   const Row = ({ index, style }) => {
     const brand = filteredBrands[index];
     return (
-      <div style={style}>
-        <SelectItem key={brand} value={brand}>
-          {brand}
-        </SelectItem>
+      <div
+        style={style}
+        className="cursor-pointer px-2 hover:bg-accent hover:text-accent-foreground flex items-center"
+        onClick={() => {
+          setSelectedBrand(brand);
+          setOpen(false);
+        }}
+      >
+        {brand}
       </div>
     );
   };
 
   return (
-    <div className="w-full">
-      <Select onValueChange={(value) => setSelectedBrand(value)}>
-        <SelectTrigger>
-          <SelectValue placeholder="Select your Brand" />
-        </SelectTrigger>
-        {brandLoading ? (
-          // Skeleton Loader
+    <Popover.Root open={open} onOpenChange={setOpen}>
+      <Popover.Trigger asChild>
+        <Button variant="outline" className="w-full font-normal justify-between">
+          {selectedBrand || "Select your Brand"}
+        </Button>
+      </Popover.Trigger>
+      <Popover.Content className="w-64 p-2 bg-white border rounded shadow-lg">
+        {isLoading ? (
           <div className="space-y-4 w-full">
             <div className="h-6 bg-gray-200 rounded w-1/2 mx-auto mt-2 animate-pulse" />
           </div>
         ) : (
-          <SelectContent>
-            <div className="px-2 py-1">
-              <Input
-                placeholder="Search..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="h-8"
-              />
-            </div>
+          <>
+            <Input
+              placeholder="Search..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="h-8 mb-2"
+            />
             {filteredBrands.length > 0 ? (
               <List
-                height={
-                  Math.min(filteredBrands.length, VISIBLE_COUNT) * ITEM_HEIGHT
-                }
+                height={Math.min(filteredBrands.length, VISIBLE_COUNT) * ITEM_HEIGHT}
                 itemCount={filteredBrands.length}
                 itemSize={ITEM_HEIGHT}
                 width="100%"
@@ -86,11 +91,9 @@ const BrandSelect = ({ selectedBrand, setSelectedBrand }) => {
                 No results found
               </div>
             )}
-          </SelectContent>
+          </>
         )}
-      </Select>
-    </div>
+      </Popover.Content>
+    </Popover.Root>
   );
-};
-
-export default BrandSelect;
+}

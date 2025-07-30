@@ -17,8 +17,6 @@ const CitySelect = ({ city = [] }) => {
         return Array.from(new Set(city?.map(item => item))).sort();
     }, [city]);
 
-
-
     const [open, setOpen] = useState(false);
     const [search, setSearch] = useState("");
 

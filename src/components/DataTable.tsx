@@ -1,10 +1,11 @@
 import React, { useMemo, useState } from "react";
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table";
-import { usePlatformStore } from "@/utils/zusStore";
+import { useCityStore, usePlatformStore } from "@/utils/zusStore";
 import { Button } from "@/components/ui/button"; // Adjust the path as needed
 import { CircleArrowDown, ChevronLeft, ChevronRight, MoveUp, MoveDown, MoveVertical } from "lucide-react";
 import * as XLSX from "xlsx";
 import { cn } from "@/lib/utils"; // Optional utility to join classNames conditionally
+import CitySelect from "./CitySelect";
 
 const DataTable = ({ tablename, data = [] }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -12,6 +13,8 @@ const DataTable = ({ tablename, data = [] }) => {
   const [sortKey, setSortKey] = useState("");
   const [sortOrder, setSortOrder] = useState("asc"); // or 'desc'
   const platform = usePlatformStore((state) => state.platform);
+  const selectedCity = useCityStore((state) => state.selectedCity);
+
 
   const rowsPerPage = 10;
 
@@ -28,9 +31,14 @@ const DataTable = ({ tablename, data = [] }) => {
   const startIndex = (currentPage - 1) * rowsPerPage;
 
   const sortedData = useMemo(() => {
-    let filtered = searchkeyword.trim()
-      ? data.filter((item) => item.keywordid?.toLowerCase().includes(searchkeyword.toLowerCase()))
-      : data;
+    let filtered =
+      searchkeyword.trim() || selectedCity
+        ? data.filter(
+          (item) =>
+            item.keywordid?.toLowerCase().includes(searchkeyword.toLowerCase()) &&
+            item.cityname === selectedCity
+        )
+        : data;
 
     if (sortKey) {
       filtered = [...filtered].sort((a, b) => {
@@ -48,7 +56,7 @@ const DataTable = ({ tablename, data = [] }) => {
     }
 
     return filtered;
-  }, [data, searchkeyword, sortKey, sortOrder]);
+  }, [data, searchkeyword, sortKey, sortOrder, selectedCity]);
 
   const handleExportToExcel = () => {
     const worksheet = XLSX.utils.json_to_sheet(sortedData);
@@ -95,6 +103,9 @@ const DataTable = ({ tablename, data = [] }) => {
               setCurrentPage(1);
             }}
           />
+          <div>
+            <CitySelect city={data.map(item => item.cityname)} />
+          </div>
           <Button
             onClick={handleExportToExcel}
             className="bg-gradient-to-r from-green-100 to-green-200 text-green-800 hover:from-green-200 hover:to-green-300 transition shadow rounded-md px-4 font-bold"
@@ -123,10 +134,10 @@ const DataTable = ({ tablename, data = [] }) => {
                       index === 0
                         ? "w-[20%]"
                         : index === 1
-                        ? "w-[20%]"
-                        : tablename === "Low Competition Market"
-                        ? "w-[30%]"
-                        : "w-[20%]"
+                          ? "w-[20%]"
+                          : tablename === "Low Competition Market"
+                            ? "w-[30%]"
+                            : "w-[20%]"
                     )}
                   >
                     <div className="flex items-center gap-1">

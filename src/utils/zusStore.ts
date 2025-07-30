@@ -9,6 +9,10 @@ type BrandStore = {
     selectedBrand: string;
     setSelectedBrand: (brand: string) => void;
 }
+type CityStore = {
+    selectedCity: string;
+    setSelectedCity: (brand: string) => void;
+}
 
 export const usePlatformStore = create<PlatformStore>((set) => ({
     platform: "Blinkit",
@@ -18,4 +22,9 @@ export const usePlatformStore = create<PlatformStore>((set) => ({
 export const useBrandStore = create<BrandStore>((set) => ({
     selectedBrand: "",
     setSelectedBrand: (brand: string) => set({ selectedBrand: brand }),
+}));
+
+export const useCityStore = create<CityStore>((set) => ({
+    selectedCity: "",
+    setSelectedCity: (city: string) => set({ selectedCity: city }),
 }));

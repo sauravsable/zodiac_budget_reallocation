@@ -18,10 +18,10 @@ const Sidebar = () => {
       </div>
 
       {/* Divider + Sticky Logout */}
-      <div className="mt-auto">
+      {/* <div className="mt-auto">
         <hr className="border-gray-300 mb-4" />
         <SidebarItem icon={<LogOut size={20} />} label="Logout" />
-      </div>
+      </div> */}
     </div>
   );
 };

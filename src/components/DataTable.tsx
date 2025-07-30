@@ -10,7 +10,7 @@ const DataTable = ({ tablename, data = [] }) => {
       : ["Keyword", "City", "Org rank", "Ad rank", "Rank Diff"];
 
   const totalPages = Math.ceil(data.length / rowsPerPage);
-  const startIndex = (currentPage - 1) * rowsPerPage;
+  const startIndex = currentPage - 1 + rowsPerPage;
   const currentData = data.slice(startIndex, startIndex + rowsPerPage);
 
   const goToPage = (page) => {

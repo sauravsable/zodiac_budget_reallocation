@@ -13,20 +13,20 @@ const WhitespaceAnalysis = () => {
 
   const [selectedBrand, setSelectedBrand] = useState("");
   const [selectedDate, setSelectedDate] = useState(null);
-  const [getData, setGetData] = useState(false)
+  const [getData, setGetData] = useState(false);
 
   const params1 = {
     date: selectedDate ? selectedDate.toISOString().split("T")[0] : "",
     brandName: selectedBrand,
     platformId: platform.toLowerCase()
   };
-  const { data: adEffectiveness, isLoading, } = useQuery({
+  const { data: adEffectiveness, isLoading } = useQuery({
     queryKey: [QueryKeys.adEffectiveness, params1],
     queryFn: ({ signal }) => api.whiteSpaceAnalysis.adEffectiveness(params1, signal),
     select: (data) => data.data,
     enabled: allParamsDefined(params1) && getData,
   });
-  const { data: lowCompetition, isLoading: isloading2, } = useQuery({
+  const { data: lowCompetition, isLoading: isloading2 } = useQuery({
     queryKey: [QueryKeys.lowCompetitionMarket, params1],
     queryFn: ({ signal }) => api.whiteSpaceAnalysis.lowCompetitionMarket(params1, signal),
     select: (data) => data.data,
@@ -102,10 +102,8 @@ const WhitespaceAnalysis = () => {
     );
   }
 
-
-
   return (
-    <div className="bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 px-6">
+    <div className="bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 px-6 max-h-screen">
       <h1 className="text-3xl font-bold text-foreground text-center gap-3 w-full p-4">Whitespace Analysis</h1>
       <div className="text-center">You will see the Whitespace Analysis for planning your ads accordingly.</div>
       {!getData ? (
@@ -136,17 +134,21 @@ const WhitespaceAnalysis = () => {
               />
             </div>
           </div>
-          <button onClick={() => {
-            if (allParamsDefined(params1)) {
-              setGetData(true);
-            }
-          }} className="py-2 px-4 rounded-3xl bg-blue-500 text-white text-md w-[20rem]">Get Data</button>
-
+          <button
+            onClick={() => {
+              if (allParamsDefined(params1)) {
+                setGetData(true);
+              }
+            }}
+            className="py-2 px-4 rounded-3xl bg-blue-500 text-white text-md w-[20rem]"
+          >
+            Get Data
+          </button>
         </div>
       ) : (
         <div className="flex gap-10 bg-white shadow-md rounded-lg p-2 mt-5">
-          <DataTable tablename='Low Competition Market' data={lowCompetition} />
-          <DataTable tablename='Ad Effectiveness' data={adEffectiveness} />
+          <DataTable tablename="Low Competition Market" data={lowCompetition} />
+          <DataTable tablename="Ad Effectiveness" data={adEffectiveness} />
         </div>
       )}
     </div>

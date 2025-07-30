@@ -1,21 +1,17 @@
 import React, { useState } from "react";
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableHead,
-  TableRow,
-  TableCell,
-} from "@/components/ui/table"; // adjust the path as necessary
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table"; // adjust the path as necessary
 
 const DataTable = ({ tablename, data = [] }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 7;
-  const tableHeader = tablename === 'Low Competition Market' ? ['Keyword', 'City', 'Competitors', 'With Ads'] : ['Keyword', 'City', 'Org rank', 'Ad rank', 'Rank Diff'];
+  const tableHeader =
+    tablename === "Low Competition Market"
+      ? ["Keyword", "City", "Competitors", "With Ads"]
+      : ["Keyword", "City", "Org rank", "Ad rank", "Rank Diff"];
 
   const totalPages = Math.ceil(data.length / rowsPerPage);
-  const startIndex = (currentPage - 1) * rowsPerPage;
-  const currentData = data.slice(startIndex , startIndex + rowsPerPage);
+  const startIndex = currentPage - 1 + rowsPerPage;
+  const currentData = data.slice(startIndex, startIndex + rowsPerPage);
 
   const goToPage = (page) => {
     if (page < 1 || page > totalPages) return;
@@ -29,13 +25,11 @@ const DataTable = ({ tablename, data = [] }) => {
       <Table className="border border-border bg-white">
         <TableHeader>
           <TableRow>
-            {
-              tableHeader.map((header, index) => (
-                <TableHead key={index} className="text-left">
-                  {header}
-                </TableHead>
-              ))
-            }
+            {tableHeader.map((header, index) => (
+              <TableHead key={index} className="text-left">
+                {header}
+              </TableHead>
+            ))}
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -44,12 +38,11 @@ const DataTable = ({ tablename, data = [] }) => {
               <TableRow key={index} className="hover:bg-gray-50">
                 <TableCell>{user.keywordid}</TableCell>
                 <TableCell>{user.cityname}</TableCell>
-                {tablename === 'Low Competition Market' ? (
+                {tablename === "Low Competition Market" ? (
                   <>
                     <TableCell>{user.total_count}</TableCell>
                     <TableCell>{user.competator_count}</TableCell>
                   </>
-
                 ) : (
                   <>
                     <TableCell>{user.org_rank}</TableCell>
@@ -57,7 +50,6 @@ const DataTable = ({ tablename, data = [] }) => {
                     <TableCell>{user.rank_difference}</TableCell>
                   </>
                 )}
-
               </TableRow>
             ))
           ) : (
@@ -92,7 +84,7 @@ const DataTable = ({ tablename, data = [] }) => {
           Next
         </button>
       </div>
-    </div >
+    </div>
   );
 };
 

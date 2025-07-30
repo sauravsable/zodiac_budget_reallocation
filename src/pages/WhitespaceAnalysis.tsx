@@ -9,7 +9,7 @@ import { allParamsDefined, api, QueryKeys } from "@/utils/api";
 import { useBrandStore, usePlatformStore } from "@/utils/zusStore";
 
 const WhitespaceAnalysis = () => {
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [getData, setGetData] = useState(false);
   const selectedBrand = useBrandStore((state) => state.selectedBrand);
   const platform = usePlatformStore((state) => state.platform);
@@ -17,7 +17,7 @@ const WhitespaceAnalysis = () => {
   const params1 = {
     date: selectedDate ? selectedDate.toISOString().split("T")[0] : "",
     brandName: selectedBrand,
-    platformId: platform.toLowerCase()
+    platformId: platform.toLowerCase(),
   };
   const { data: adEffectiveness, isLoading } = useQuery({
     queryKey: [QueryKeys.adEffectiveness, params1],
@@ -34,7 +34,6 @@ const WhitespaceAnalysis = () => {
 
   console.log("adEffectiveness", adEffectiveness, "lowCompetition", lowCompetition);
   console.log(selectedBrand, "selectedBrand");
-
 
   if (isLoading || isloading2) {
     return (
@@ -130,7 +129,7 @@ const WhitespaceAnalysis = () => {
               <DatePicker
                 placeholderText="Select a date"
                 selected={selectedDate}
-                onChange={(date) => setSelectedDate(date)}
+                onChange={(date: Date | null) => setSelectedDate(date)}
                 maxDate={new Date()}
                 className="w-[17rem] px-4 text-center  py-2 border  rounded-lg  focus:outline-none focus:ring-2 focus:ring-blue-500"
                 dateFormat="yyyy-MM-dd"

@@ -8,12 +8,12 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useQuery } from "@tanstack/react-query";
 import { allParamsDefined, api, QueryKeys } from "@/utils/api";
-import { usePlatformStore } from "@/utils/zusStore";
+import { useBrandStore, usePlatformStore } from "@/utils/zusStore";
 
 const WhitespaceAnalysis = () => {
-  const [selectedBrand, setSelectedBrand] = useState("");
   const [selectedDate, setSelectedDate] = useState(null);
   const [getData, setGetData] = useState(false);
+  const selectedBrand = useBrandStore((state) => state.selectedBrand);
 
   const params1 = {
     date: selectedDate ? selectedDate.toISOString().split("T")[0] : "",
@@ -34,10 +34,12 @@ const WhitespaceAnalysis = () => {
   });
 
   console.log("adEffectiveness", adEffectiveness, "lowCompetition", lowCompetition);
+  console.log(selectedBrand, "selectedBrand");
+
 
   if (isLoading || isloading2) {
     return (
-      <div className="flex gap-10 bg-white shadow-md rounded-lg p-2 mt-5">
+      <div className="flex flex-col w-[98%] mx-auto gap-10 bg-white shadow-md rounded-lg p-2 mt-5">
         {/* Left table skeleton */}
         <div className="space-y-4 w-full">
           <div className="h-6 bg-gray-200 rounded w-1/2 mx-auto mt-2 animate-pulse" />
@@ -119,7 +121,7 @@ const WhitespaceAnalysis = () => {
             <div className="flex flex-col">
               <div className="mb-2 text-center text-lg font-semibold text-gray-800">Select Your Brand</div>
               <div className="w-[17rem]">
-                <BrandSelect selectedBrand={selectedBrand} setSelectedBrand={setSelectedBrand} />
+                <BrandSelect />
               </div>
             </div>
 
@@ -148,7 +150,7 @@ const WhitespaceAnalysis = () => {
           </button>
         </div>
       ) : (
-        <div className="flex gap-10 bg-white shadow-md rounded-lg p-2 mt-5">
+        <div className="flex flex-col gap-10 my-10 ">
           <DataTable tablename="Low Competition Market" data={lowCompetition} />
           <DataTable tablename="Ad Effectiveness" data={adEffectiveness} />
         </div>
@@ -157,4 +159,4 @@ const WhitespaceAnalysis = () => {
   );
 };
 
-export default WhitespaceAnalysis;
+export default React.memo(WhitespaceAnalysis);

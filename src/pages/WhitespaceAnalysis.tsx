@@ -22,7 +22,7 @@ const WhitespaceAnalysis = () => {
   const { data: adEffectiveness, isLoading } = useQuery({
     queryKey: [QueryKeys.adEffectiveness, params1],
     queryFn: ({ signal }) => api.whiteSpaceAnalysis.adEffectiveness(params1, signal),
-    select: (data) => data.data,
+    select: (data) => data.data.filter(item=>item.org_rank!==0 && item.ad_rank!==0),
     enabled: allParamsDefined(params1) && getData,
   });
   const { data: lowCompetition, isLoading: isloading2 } = useQuery({

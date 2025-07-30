@@ -13,7 +13,7 @@ const VISIBLE_COUNT = 8;
 export default function BrandSelect() {
   const platform = usePlatformStore((state) => state.platform);
   const setSelectedBrand = useBrandStore((state) => state.setSelectedBrand);
-  const selectedBrand= useBrandStore((state) => state.selectedBrand);
+  const selectedBrand = useBrandStore((state) => state.selectedBrand);
   const { data: brands, isLoading } = useQuery({
     queryKey: [
       QueryKeys.lowCompetitionMarket,

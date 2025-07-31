@@ -2,11 +2,14 @@ import React, { useState } from "react";
 import BrandSelect from "@/components/BrandSelect";
 import DataTable from "@/components/DataTable";
 import PlatformSwitch from "@/components/PlatformSwitch";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 import { useQuery } from "@tanstack/react-query";
 import { allParamsDefined, api, QueryKeys } from "@/utils/api";
 import { useBrandStore, usePlatformStore } from "@/utils/zusStore";
+import "react-day-picker/dist/style.css";
+import DatePicker from "@/components/DatePicker";
+import { Button } from "@/components/ui/button";
+import { motion } from "framer-motion";
+import { Settings } from "lucide-react";
 
 const WhitespaceAnalysis = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -22,7 +25,7 @@ const WhitespaceAnalysis = () => {
   const { data: adEffectiveness, isLoading } = useQuery({
     queryKey: [QueryKeys.adEffectiveness, params1],
     queryFn: ({ signal }) => api.whiteSpaceAnalysis.adEffectiveness(params1, signal),
-    select: (data) => data.data.filter(item=>item.org_rank!==0 && item.ad_rank!==0),
+    select: (data) => data.data.filter((item) => item.org_rank !== 0 && item.ad_rank !== 0),
     enabled: allParamsDefined(params1) && getData,
   });
   const { data: lowCompetition, isLoading: isloading2 } = useQuery({
@@ -111,44 +114,46 @@ const WhitespaceAnalysis = () => {
       {!getData ? (
         <div className="flex flex-col gap-10 p-4 min-h-96 items-center justify-center bg-white shadow-md rounded-lg mt-10 w-[60%] mx-auto">
           <div className="">
-            <div className="mb-5 text-center font-bold">Select Your platform</div>
+            <div className="mb-5 text-center font-bold text-gray-800">Select a platform</div>
             <PlatformSwitch />
           </div>
           <div className="flex flex-row items-center justify-center gap-2 w-full">
             {/* Brand Selection */}
-            <div className="flex flex-col">
-              <div className="mb-2 text-center text-lg font-semibold text-gray-800">Select Your Brand</div>
-              <div className="w-[17rem]">
-                <BrandSelect />
-              </div>
+
+            <div className="w-[17rem]">
+              <BrandSelect />
             </div>
 
             {/* Date Picker */}
-            <div className="">
-              <div className="mb-2 text-center text-lg font-semibold text-gray-800">Select a Date</div>
-              <DatePicker
-                placeholderText="Select a date"
-                selected={selectedDate}
-                onChange={(date: Date | null) => setSelectedDate(date)}
-                maxDate={new Date()}
-                className="w-[17rem] px-4 text-center  py-2 border  rounded-lg  focus:outline-none focus:ring-2 focus:ring-blue-500"
-                dateFormat="yyyy-MM-dd"
-              />
+            <div className="relative w-[17rem]">
+              <DatePicker selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
             </div>
           </div>
-          <button
-            onClick={() => {
-              if (allParamsDefined(params1)) {
-                setGetData(true);
-              }
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.96 }}
+            transition={{
+              type: "spring",
+              stiffness: 300,
+              damping: 20,
             }}
-            className="py-2 px-4 rounded-3xl bg-blue-500 text-white text-md w-[20rem]"
           >
-            Get Data
-          </button>
+            <Button
+              onClick={() => {
+                if (allParamsDefined(params1)) {
+                  setGetData(true);
+                }
+              }}
+              variant="default"
+              size="lg"
+              className="w-[20rem] rounded-xl bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 text-white font-semibold shadow-xl hover:brightness-110 active:brightness-95 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all duration-200"
+            >
+              <Settings /> Show Whitespace Analysis
+            </Button>
+          </motion.div>
         </div>
       ) : (
-        <div className="flex flex-col gap-10 my-10 ">
+        <div className="flex flex-col gap-10 my-10 pb-10">
           <DataTable tablename="Low Competition Market" data={lowCompetition} />
           <DataTable tablename="Ad Effectiveness" data={adEffectiveness} />
         </div>

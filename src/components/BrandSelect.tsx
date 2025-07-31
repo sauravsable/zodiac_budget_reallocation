@@ -6,6 +6,8 @@ import { useQuery } from "@tanstack/react-query";
 import { allParamsDefined, api, QueryKeys } from "@/utils/api";
 import { useBrandStore, usePlatformStore } from "@/utils/zusStore";
 import { FixedSizeList as List } from "react-window";
+import { ChevronDown, Tag } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const ITEM_HEIGHT = 36;
 const VISIBLE_COUNT = 8;
@@ -14,16 +16,10 @@ export default function BrandSelect() {
   const platform = usePlatformStore((state) => state.platform);
   const setSelectedBrand = useBrandStore((state) => state.setSelectedBrand);
   const selectedBrand = useBrandStore((state) => state.selectedBrand);
+
   const { data: brands, isLoading } = useQuery({
-    queryKey: [
-      QueryKeys.lowCompetitionMarket,
-      { platformId: platform.toLowerCase() },
-    ],
-    queryFn: ({ signal }) =>
-      api.whiteSpaceAnalysis.brandList(
-        { platformId: platform.toLowerCase() },
-        signal
-      ),
+    queryKey: [QueryKeys.lowCompetitionMarket, { platformId: platform.toLowerCase() }],
+    queryFn: ({ signal }) => api.whiteSpaceAnalysis.brandList({ platformId: platform.toLowerCase() }, signal),
     select: (data) => data.data,
     enabled: allParamsDefined({ platformId: platform.toLowerCase() }),
   });
@@ -32,12 +28,7 @@ export default function BrandSelect() {
   const [search, setSearch] = useState("");
 
   const filteredBrands = useMemo(
-    () =>
-      brands
-        ?.filter((brand) =>
-          brand.toLowerCase().includes(search.toLowerCase())
-        )
-        .sort() ?? [],
+    () => brands?.filter((brand) => brand.toLowerCase().includes(search.toLowerCase())).sort() ?? [],
     [brands, search]
   );
 
@@ -46,12 +37,16 @@ export default function BrandSelect() {
     return (
       <div
         style={style}
-        className="cursor-pointer px-2 hover:bg-accent hover:text-accent-foreground flex items-center"
+        className={cn(
+          "cursor-pointer px-3 py-1.5 text-sm flex items-center transition-colors duration-200",
+          selectedBrand === brand ? "bg-blue-500 text-white font-medium" : "hover:bg-blue-100"
+        )}
         onClick={() => {
           setSelectedBrand(brand);
           setOpen(false);
         }}
       >
+        <Tag className="h-4 w-4 mr-2" />
         {brand}
       </div>
     );
@@ -60,11 +55,20 @@ export default function BrandSelect() {
   return (
     <Popover.Root open={open} onOpenChange={setOpen}>
       <Popover.Trigger asChild>
-        <Button variant="outline" className="w-full font-normal justify-between">
+        <Button
+          variant="outline"
+          className="w-full justify-between font-medium text-base px-4 py-2 text-gray-800 hover:bg-blue-50 transition-all duration-200"
+        >
           {selectedBrand || "Select your Brand"}
+          <ChevronDown className="ml-2 h-4 w-4 text-muted-foreground" />
         </Button>
       </Popover.Trigger>
-      <Popover.Content className="w-64 p-2 bg-white border rounded shadow-lg">
+      <Popover.Content
+        className="w-72 p-3 bg-white border border-gray-200 rounded-xl shadow-xl z-50"
+        side="bottom"
+        align="start"
+        avoidCollisions={false}
+      >
         {isLoading ? (
           <div className="space-y-4 w-full">
             <div className="h-6 bg-gray-200 rounded w-1/2 mx-auto mt-2 animate-pulse" />
@@ -72,24 +76,24 @@ export default function BrandSelect() {
         ) : (
           <>
             <Input
-              placeholder="Search..."
+              placeholder="Search brand..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="h-8 mb-2"
+              className="h-9 mb-3 text-sm rounded-md"
             />
             {filteredBrands.length > 0 ? (
-              <List
-                height={Math.min(filteredBrands.length, VISIBLE_COUNT) * ITEM_HEIGHT}
-                itemCount={filteredBrands.length}
-                itemSize={ITEM_HEIGHT}
-                width="100%"
-              >
-                {Row}
-              </List>
-            ) : (
-              <div className="px-4 py-2 text-sm text-muted-foreground">
-                No results found
+              <div className="rounded-md border border-gray-200 overflow-hidden max-h-[300px]">
+                <List
+                  height={Math.min(filteredBrands.length, VISIBLE_COUNT) * ITEM_HEIGHT}
+                  itemCount={filteredBrands.length}
+                  itemSize={ITEM_HEIGHT}
+                  width="100%"
+                >
+                  {Row}
+                </List>
               </div>
+            ) : (
+              <div className="px-3 py-2 text-sm text-muted-foreground">No results found.</div>
             )}
           </>
         )}

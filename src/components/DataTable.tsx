@@ -15,7 +15,6 @@ const DataTable = ({ tablename, data = [] }) => {
   const platform = usePlatformStore((state) => state.platform);
   const selectedCity = useCityStore((state) => state.selectedCity);
 
-
   const rowsPerPage = 10;
 
   const tableHeader =
@@ -34,10 +33,9 @@ const DataTable = ({ tablename, data = [] }) => {
     let filtered =
       searchkeyword.trim() || selectedCity
         ? data.filter(
-          (item) =>
-            item.keywordid?.toLowerCase().includes(searchkeyword.toLowerCase()) &&
-            item.cityname === selectedCity
-        )
+            (item) =>
+              item.keywordid?.toLowerCase().includes(searchkeyword.toLowerCase()) && item.cityname === selectedCity
+          )
         : data;
 
     if (sortKey) {
@@ -104,13 +102,13 @@ const DataTable = ({ tablename, data = [] }) => {
             }}
           />
           <div>
-            <CitySelect city={data.map(item => item.cityname)} />
+            <CitySelect city={data.map((item) => item.cityname)} />
           </div>
           <Button
             onClick={handleExportToExcel}
-            className="bg-gradient-to-r from-green-100 to-green-200 text-green-800 hover:from-green-200 hover:to-green-300 transition shadow rounded-md px-4 font-bold"
+            className="bg-gradient-to-br from-green-400 via-emerald-400 to-teal-300 text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:scale-[1.03] active:scale-95 transition-all flex items-center gap-1"
           >
-            <CircleArrowDown /> Export
+            <CircleArrowDown className="animate-bounce-slow" /> Export
           </Button>
         </div>
       </div>
@@ -134,10 +132,10 @@ const DataTable = ({ tablename, data = [] }) => {
                       index === 0
                         ? "w-[20%]"
                         : index === 1
-                          ? "w-[20%]"
-                          : tablename === "Low Competition Market"
-                            ? "w-[30%]"
-                            : "w-[20%]"
+                        ? "w-[20%]"
+                        : tablename === "Low Competition Market"
+                        ? "w-[30%]"
+                        : "w-[20%]"
                     )}
                   >
                     <div className="flex items-center gap-1">

@@ -20,21 +20,22 @@ const DataTable = ({ tablename, data = [] }) => {
   const tableHeader =
     tablename === "Low Competition Market"
       ? ["Keyword", "City", "Impressions", "Competitors", "With Ads"]
-      : ["Keyword", "City", "Impressions","Org rank", "Ad rank", "Rank Diff"];
+      : ["Keyword", "City", "Impressions", "Org rank", "Ad rank", "Rank Diff"];
 
   const headerKeys =
     tablename === "Low Competition Market"
-      ? ["keywordid", "cityname", "impressions","competitor", "with_ads"]
-      : ["keywordid", "cityname", "impressions","org_rank", "ad_rank", "rank_difference"];
+      ? ["keywordid", "cityname", "impressions", "competitor", "with_ads"]
+      : ["keywordid", "cityname", "impressions", "org_rank", "ad_rank", "rank_difference"];
 
   const startIndex = (currentPage - 1) * rowsPerPage;
 
   const sortedData = useMemo(() => {
     let filtered =
       searchkeyword.trim() || selectedCity
-        ? data.filter(
-            (item) =>
-              item.keywordid?.toLowerCase().includes(searchkeyword.toLowerCase()) && item.cityname === selectedCity
+        ? data.filter((item) =>
+            selectedCity == "All Cities"
+              ? item.keywordid?.toLowerCase().includes(searchkeyword.toLowerCase())
+              : item.keywordid?.toLowerCase().includes(searchkeyword.toLowerCase()) && item.cityname === selectedCity
           )
         : data;
 

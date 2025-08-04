@@ -4,22 +4,20 @@ import { useLocation, Link } from "react-router-dom";
 
 const Sidebar = () => {
   return (
-    <div className="h-screen w-64 bg-gradient-to-b from-blue-100 via-white to-white text-gray-800 flex flex-col p-4 shadow-xl border-r border-gray-200">
+    <div className="h-screen w-64 bg-white/60 backdrop-blur-md text-gray-700 flex flex-col px-6 py-8 shadow-2xl border-r border-gray-200">
       {/* Logo */}
-      <div className="text-2xl font-bold mb-10 flex items-center justify-center">
-        <span className="text-blue-600">Zodiac.ai</span>
-      </div>
+      <div className="text-3xl font-extrabold text-center text-blue-600 tracking-tight mb-12">Zodiac.ai</div>
 
       {/* Menu Items */}
-      <div className="flex-1 flex flex-col gap-4">
+      <div className="flex-1 flex flex-col gap-2">
         <SidebarItem icon={<BarChart2 size={20} />} label="Budget Allocation" />
         <SidebarItem icon={<Layout size={20} />} label="Whitespace Analysis" />
         <SidebarItem icon={<Settings size={20} />} label="Automation" />
       </div>
 
-      {/* Divider + Sticky Logout */}
-      {/* <div className="mt-auto">
-        <hr className="border-gray-300 mb-4" />
+      {/* Sticky Logout */}
+      {/* Uncomment below for logout */}
+      {/* <div className="mt-auto pt-6 border-t border-gray-300">
         <SidebarItem icon={<LogOut size={20} />} label="Logout" />
       </div> */}
     </div>
@@ -39,6 +37,8 @@ const SidebarItem = ({ icon, label }) => {
         return "/automation";
       case "Logout":
         return "/logout";
+      default:
+        return "/";
     }
   };
 
@@ -46,14 +46,14 @@ const SidebarItem = ({ icon, label }) => {
   const path = getPathFromLabel(label);
 
   return (
-    <Link to={path} className="no-underline text-inherit">
+    <Link to={path} className="no-underline">
       <div
-        className={`${
-          isActive ? "bg-blue-200" : ""
-        } flex items-center gap-3 hover:bg-blue-200 px-4 py-3 rounded-lg cursor-pointer transition-all duration-200`}
+        className={`group flex items-center gap-4 px-4 py-3 rounded-xl cursor-pointer transition-all duration-300 
+        ${isActive ? "bg-blue-100 text-blue-600 border-l-4 border-blue-500" : "hover:bg-blue-50"}
+        `}
       >
-        {icon}
-        <span className="text-sm font-medium">{label}</span>
+        <div className="transition-transform duration-200 group-hover:scale-110">{icon}</div>
+        <span className="text-sm font-semibold">{label}</span>
       </div>
     </Link>
   );

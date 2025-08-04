@@ -19,13 +19,13 @@ const DataTable = ({ tablename, data = [] }) => {
 
   const tableHeader =
     tablename === "Low Competition Market"
-      ? ["Keyword", "City", "Impressions", "Competitors", "With Ads"]
-      : ["Keyword", "City", "Impressions", "Org rank", "Ad rank", "Rank Diff"];
+      ? ["Keyword", "City", "Impressions", "Competitors", "With Ads", "Score"]
+      : ["Keyword", "City", "Org rank", "Ad rank", "Rank Diff"];
 
   const headerKeys =
     tablename === "Low Competition Market"
-      ? ["keywordid", "cityname", "impressions", "competitor", "with_ads"]
-      : ["keywordid", "cityname", "impressions", "org_rank", "ad_rank", "rank_difference"];
+      ? ["keywordid", "cityname", "impressions", "competitor", "with_ads", "score"]
+      : ["keywordid", "cityname", "org_rank", "ad_rank", "rank_difference"];
 
   const startIndex = (currentPage - 1) * rowsPerPage;
 
@@ -171,12 +171,14 @@ const DataTable = ({ tablename, data = [] }) => {
                 >
                   <TableCell className="px-4 py-3 truncate text-gray-800 font-medium">{user.keywordid}</TableCell>
                   <TableCell className="px-4 py-3 truncate text-gray-600">{user.cityname}</TableCell>
-                  <TableCell className="px-4 py-3 truncate text-gray-600">{user.impressions}</TableCell>
+                  
 
                   {tablename === "Low Competition Market" ? (
                     <>
+                      <TableCell className="px-4 py-3 truncate text-gray-600">{user.impressions}</TableCell>
                       <TableCell className="px-4 py-3 text-indigo-700">{user.competitor}</TableCell>
                       <TableCell className="px-4 py-3 text-pink-700">{user.with_ads}</TableCell>
+                       <TableCell className="px-4 py-3 text-pink-700">{user.score}</TableCell>
                     </>
                   ) : (
                     <>

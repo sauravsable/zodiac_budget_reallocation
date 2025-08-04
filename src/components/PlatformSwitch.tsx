@@ -1,4 +1,4 @@
-import { usePlatformStore } from "@/utils/zusStore";
+import { useBrandStore, usePlatformStore } from "@/utils/zusStore";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { Store } from "lucide-react"; // You can use other icons if needed
@@ -6,6 +6,12 @@ import { Store } from "lucide-react"; // You can use other icons if needed
 const PlatformSwitch = () => {
   const platform = usePlatformStore((state) => state.platform);
   const setPlatform = usePlatformStore((state) => state.setPlatform);
+   const setSelectedBrand = useBrandStore((state) => state.setSelectedBrand);
+
+  const handlePlatformChange = (label) => {
+    setSelectedBrand("");
+    setPlatform(label)
+  }
 
   const platforms = [
     {
@@ -43,7 +49,7 @@ const PlatformSwitch = () => {
               disabled={disabled}
               whileTap={{ scale: 0.95 }}
               whileHover={!disabled ? { scale: 1.05 } : {}}
-              onClick={() => !disabled && setPlatform(label)}
+              onClick={() => !disabled && handlePlatformChange(label)}
               className={cn(
                 "flex items-center justify-center px-5 py-3 min-w-[9rem] text-sm font-semibold rounded-xl border transition-all duration-300",
                 "focus:outline-none",

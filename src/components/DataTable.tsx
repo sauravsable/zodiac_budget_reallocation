@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table";
-import { useCityStore, usePlatformStore } from "@/utils/zusStore";
+import { useCityStore, usePlatformStore, useBrandStore } from "@/utils/zusStore";
 import { Button } from "@/components/ui/button"; // Adjust the path as needed
 import { CircleArrowDown, ChevronLeft, ChevronRight, MoveUp, MoveDown, MoveVertical } from "lucide-react";
 import * as XLSX from "xlsx";
@@ -14,6 +14,7 @@ const DataTable = ({ tablename, data = [] }) => {
   const [sortOrder, setSortOrder] = useState("asc"); // or 'desc'
   const platform = usePlatformStore((state) => state.platform);
   const selectedCity = useCityStore((state) => state.selectedCity);
+  const selectedBrand = useBrandStore((state) => state.selectedBrand);
 
   const rowsPerPage = 10;
 
@@ -88,9 +89,20 @@ const DataTable = ({ tablename, data = [] }) => {
     <div className="flex flex-col gap-6 bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-gray-200 p-6 max-w-full overflow-hidden transition-all duration-300">
       {/* Top Section */}
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+
+        <div className="flex gap-4">
+
         <div className="text-sm font-medium px-4 py-2 rounded-full bg-gradient-to-r from-indigo-200 via-blue-200 to-cyan-200 text-blue-800 shadow-inner tracking-wide">
           🌐 Platform: <span className="font-semibold">{platform}</span>
         </div>
+
+        <div className="text-sm font-medium px-4 py-2 rounded-full bg-gradient-to-r from-yellow-200 via-green-200 to-green-200 text-yellow-800 shadow-inner tracking-wide">
+          🌐 Brand: <span className="font-semibold">{selectedBrand}</span>
+        </div>
+
+
+        </div>
+        
 
         <div className="flex gap-2 w-full sm:w-auto">
           <input

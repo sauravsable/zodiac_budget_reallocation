@@ -56,9 +56,11 @@ const CitySelect = ({ city = [] }) => {
         </Button>
       </Popover.Trigger>
       <Popover.Content
-        className="w-72 p-3 bg-white border border-gray-200 rounded-xl shadow-xl z-50"
+        className="w-60 p-3 bg-white border border-gray-200 rounded-xl shadow-xl z-50"
         side="bottom"
         align="start"
+        sideOffset={4}
+        avoidCollisions={false}
       >
         {uniqueCities.length === 0 ? (
           <div className="space-y-4 w-full">

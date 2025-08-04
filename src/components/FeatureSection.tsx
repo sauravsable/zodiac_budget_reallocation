@@ -44,7 +44,7 @@ const methodology = [
   },
 ];
 
-export default function ElegantFeaturesUI() {
+export default function FeaturesSection() {
   return (
     <div className="space-y-16 py-16">
       <motion.div

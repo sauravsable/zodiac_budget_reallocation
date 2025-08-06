@@ -29,9 +29,9 @@ const Sidebar = () => {
         </div>
 
         {/* Sticky Logout */}
-        <div className="pt-6 mt-8 border-t border-white/20">
+        {/* <div className="pt-6 mt-8 border-t border-white/20">
           <SidebarItem icon={<LogOut size={22} />} label="Logout" />
-        </div>
+        </div> */}
       </div>
     </div>
   );
